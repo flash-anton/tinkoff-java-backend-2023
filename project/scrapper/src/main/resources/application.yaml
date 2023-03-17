@@ -1,2 +1,2 @@
-app:
-  test: 111
+app.test: 111
+springdoc.swagger-ui.path: /swagger-ui
