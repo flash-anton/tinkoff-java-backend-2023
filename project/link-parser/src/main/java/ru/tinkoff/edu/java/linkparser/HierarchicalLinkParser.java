@@ -55,12 +55,25 @@ public class HierarchicalLinkParser
 	 */
 	private @NotNull LinkContent parse( @NotNull HierarchicalLinkContent hlc )
 	{
-		LinkContent lc = parseImpl( hlc );
-		if( (lc instanceof UnsupportedLinkContent) && (next != null) )
+		if( isSupportedImpl( hlc ) )
 		{
-			lc = next.parse( hlc );
+			return parseImpl( hlc );
 		}
-		return lc;
+		if( next != null )
+		{
+			return next.parse( hlc );
+		}
+		return new UnsupportedLinkContent();
+	}
+
+	/**
+	 * Реализация проверки поддержки парсинга содержимого иерархической ссылки.
+	 * @param hlc содержимое иерархической ссылки.
+	 * @return true если поддерживается.
+	 */
+	protected boolean isSupportedImpl( @NotNull HierarchicalLinkContent hlc )
+	{
+		return true;
 	}
 
 	/**

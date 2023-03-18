@@ -19,15 +19,17 @@ public class StackOverflowLinkParser extends HierarchicalLinkParser
 	}
 
 	@Override
+	protected boolean isSupportedImpl( @NotNull HierarchicalLinkContent hlc )
+	{
+		return hlc.authority().equals( "stackoverflow.com" ) &&
+			   (hlc.path().getNameCount() >= 2) &&
+			   hlc.path().getName( 0 ).toString().equals( "questions" );
+	}
+
+	@Override
 	protected @NotNull LinkContent parseImpl( @NotNull HierarchicalLinkContent hlc )
 	{
-		if( hlc.authority().equals( "stackoverflow.com" ) &&
-			(hlc.path().getNameCount() >= 2) &&
-			hlc.path().getName( 0 ).toString().equals( "questions" ) )
-		{
-			String questionId = hlc.path().getName( 1 ).toString();
-			return new StackOverflowLinkContent( questionId );
-		}
-		return new UnsupportedLinkContent();
+		String questionId = hlc.path().getName( 1 ).toString();
+		return new StackOverflowLinkContent( questionId );
 	}
 }

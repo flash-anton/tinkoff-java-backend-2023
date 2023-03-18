@@ -19,15 +19,17 @@ public class GitHubLinkParser extends HierarchicalLinkParser
 	}
 
 	@Override
+	protected boolean isSupportedImpl( @NotNull HierarchicalLinkContent hlc )
+	{
+		return hlc.authority().equals( "github.com" ) &&
+			   (hlc.path().getNameCount() >= 2);
+	}
+
+	@Override
 	protected @NotNull LinkContent parseImpl( @NotNull HierarchicalLinkContent hlc )
 	{
-		if( hlc.authority().equals( "github.com" ) &&
-			(hlc.path().getNameCount() >= 2) )
-		{
-			String user = hlc.path().getName( 0 ).toString();
-			String repository = hlc.path().getName( 1 ).toString();
-			return new GitHubLinkContent( user, repository );
-		}
-		return new UnsupportedLinkContent();
+		String user = hlc.path().getName( 0 ).toString();
+		String repository = hlc.path().getName( 1 ).toString();
+		return new GitHubLinkContent( user, repository );
 	}
 }
