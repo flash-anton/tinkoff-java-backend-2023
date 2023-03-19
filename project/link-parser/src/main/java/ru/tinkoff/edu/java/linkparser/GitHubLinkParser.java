@@ -1,35 +1,34 @@
 package ru.tinkoff.edu.java.linkparser;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import ru.tinkoff.edu.java.linkparser.LinkContent.*;
+
+import java.net.URI;
 
 /**
  * Парсер ссылки с GitHub, который возвращает пару пользователь/репозиторий.
  */
-public class GitHubLinkParser extends HierarchicalLinkParser
+public class GitHubLinkParser extends LinkParser
 {
-	/**
-	 * @param next следующий парсер иерархической ссылки в Цепочке Обязанностей.
-	 */
-	public GitHubLinkParser( @Nullable HierarchicalLinkParser next )
+	@Override
+	protected boolean isSupported( @NotNull URI url )
 	{
-		super( next );
+		if( (url.getAuthority() == null) || (url.getPath() == null) )
+		{
+			return false;
+		}
+
+		return url.getAuthority().equals( "github.com" ) &&
+			   url.getPath().split( "/" ).length >= 3;
 	}
 
 	@Override
-	protected boolean isSupportedImpl( @NotNull HierarchicalLinkContent hlc )
+	protected @NotNull LinkContent parseImpl( @NotNull URI url )
 	{
-		return hlc.authority().equals( "github.com" ) &&
-			   (hlc.path().getNameCount() >= 2);
-	}
-
-	@Override
-	protected @NotNull LinkContent parseImpl( @NotNull HierarchicalLinkContent hlc )
-	{
-		String user = hlc.path().getName( 0 ).toString();
-		String repository = hlc.path().getName( 1 ).toString();
+		String[] path = url.getPath().split( "/" );
+		String user = path[1];
+		String repository = path[2];
 		return new GitHubLinkContent( user, repository );
 	}
 }

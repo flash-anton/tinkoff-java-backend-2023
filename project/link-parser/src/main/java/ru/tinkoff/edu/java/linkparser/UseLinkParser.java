@@ -10,9 +10,8 @@ public class UseLinkParser
 {
 	public static void main( String[] args )
 	{
-		HierarchicalLinkParser linkParser = new HierarchicalLinkParser( null );
-		linkParser = new StackOverflowLinkParser( linkParser );
-		linkParser = new GitHubLinkParser( linkParser );
+		LinkParser linkParser = new StackOverflowLinkParser().setNext( null );
+		linkParser = new GitHubLinkParser().setNext( linkParser );
 
 		Stream.of(
 			"https://github.com/sanyarnd/tinkoff-java-course-2022/",
