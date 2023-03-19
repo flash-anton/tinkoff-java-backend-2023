@@ -10,8 +10,9 @@ public class UseLinkParser
 {
 	public static void main( String[] args )
 	{
-		LinkParser linkParser = new StackOverflowLinkParser().setNext( null );
-		linkParser = new GitHubLinkParser().setNext( linkParser );
+		LinkParser firstParser = new StackOverflowLinkParser();
+		firstParser.setNext( new GitHubLinkParser() )
+				   .setNext( new GitHubLinkParser() ); // так добавлять остальные парсеры в Цепочку
 
 		Stream.of(
 			"https://github.com/sanyarnd/tinkoff-java-course-2022/",
@@ -21,7 +22,7 @@ public class UseLinkParser
 		)
 		.peek( System.out::println )
 		.map( URI::create )
-		.map( linkParser::parse )
+		.map( firstParser::parse )
 		.forEach( System.out::println );
 	}
 }

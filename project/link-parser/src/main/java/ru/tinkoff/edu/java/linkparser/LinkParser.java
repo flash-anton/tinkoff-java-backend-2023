@@ -20,12 +20,11 @@ public abstract class LinkParser
 	/**
 	 * Задать следующий парсер ссылки.
 	 * @param next следующий парсер ссылки.
-	 * @return this.
+	 * @return next.
 	 */
 	public final LinkParser setNext( @Nullable LinkParser next )
 	{
-		this.next = next;
-		return this;
+		return this.next = next;
 	}
 
 	/**
