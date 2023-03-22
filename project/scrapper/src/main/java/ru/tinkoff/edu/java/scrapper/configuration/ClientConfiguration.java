@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
+import ru.tinkoff.edu.java.scrapper.webclient.StackOverflowClient;
 
 @Validated
 @ConfigurationProperties( prefix = "client", ignoreUnknownFields = false )
@@ -12,6 +13,7 @@ import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
 public final class ClientConfiguration
 {
 	private final String gitHubApiBaseUrl;
+	private final String stackOverflowApiBaseUrl;
 
 	@Bean
 	public GitHubClient gitHubClient()
@@ -21,5 +23,15 @@ public final class ClientConfiguration
 			return new GitHubClient();
 		}
 		return new GitHubClient( gitHubApiBaseUrl );
+	}
+
+	@Bean
+	public StackOverflowClient stackOverflowClient()
+	{
+		if( stackOverflowApiBaseUrl == null || stackOverflowApiBaseUrl.isEmpty() )
+		{
+			return new StackOverflowClient();
+		}
+		return new StackOverflowClient( stackOverflowApiBaseUrl );
 	}
 }

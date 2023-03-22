@@ -1,3 +1,5 @@
 app.test: 111
-client.gitHubApiBaseUrl: https://api.github.com
+client:
+  gitHubApiBaseUrl: https://api.github.com
+  stackOverflowApiBaseUrl: https://api.stackexchange.com/2.3
 springdoc.swagger-ui.path: /swagger-ui
