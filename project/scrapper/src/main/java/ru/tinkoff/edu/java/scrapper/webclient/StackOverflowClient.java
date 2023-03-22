@@ -14,19 +14,18 @@ public class StackOverflowClient
 
 	public StackOverflowClient()
 	{
-		this( "https://api.stackexchange.com/2.3" );
+		this( null );
 	}
 
 	public StackOverflowClient( String baseUrl )
 	{
 		HttpClient httpClient = HttpClient.create().compress( true );
 
-		client = WebClient.builder()
-						  .baseUrl( baseUrl )
-						  .defaultHeader( "Accept", "application/json" )
-						  .defaultHeader( "Accept-Encoding", "gzip" )
-						  .clientConnector( new ReactorClientHttpConnector( httpClient ) )
-						  .build();
+		client = WebClientBuilder.create( baseUrl, "https://api.stackexchange.com/2.3" )
+								 .defaultHeader( "Accept", "application/json" )
+								 .defaultHeader( "Accept-Encoding", "gzip" )
+								 .clientConnector( new ReactorClientHttpConnector( httpClient ) )
+								 .build();
 	}
 
 	public StackOverflowQuestionInfoRequest fetchQuestionInfo( String questionId )

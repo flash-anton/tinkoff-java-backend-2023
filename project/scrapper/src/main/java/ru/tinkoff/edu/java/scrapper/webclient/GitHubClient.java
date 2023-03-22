@@ -9,16 +9,15 @@ public class GitHubClient
 
 	public GitHubClient()
 	{
-		this( "https://api.github.com" );
+		this( null );
 	}
 
 	public GitHubClient( String baseUrl )
 	{
-		client = WebClient.builder()
-						  .baseUrl( baseUrl )
-						  .defaultHeader( "Accept", "application/vnd.github+json" )
-						  .defaultHeader( "X-GitHub-Api-Version", "2022-11-28" )
-						  .build();
+		client = WebClientBuilder.create( baseUrl, "https://api.github.com" )
+								 .defaultHeader( "Accept", "application/vnd.github+json" )
+								 .defaultHeader( "X-GitHub-Api-Version", "2022-11-28" )
+								 .build();
 	}
 
 	public GitHubRepositoryInfoResponse fetchRepositoryInfo( String user, String repository )
