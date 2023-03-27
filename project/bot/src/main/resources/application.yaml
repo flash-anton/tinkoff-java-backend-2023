@@ -1,2 +1,4 @@
-app.test: 111
+app:
+  test: 111
+  telegramToken: ${TELEGRAM_TOKEN}
 springdoc.swagger-ui.path: /swagger-ui
