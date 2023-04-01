@@ -1,2 +1,13 @@
 app:
   test: 111
+  scheduler.interval: PT5S
+clients:
+  github:
+    defaultBaseUrl: https://api.github.com
+    defaultHeaders:
+      Accept: application/vnd.github+json
+      X-GitHub-Api-Version: 2022-11-28
+  stackoverflow:
+    defaultBaseUrl: https://api.stackexchange.com/2.3
+    compress: true
+springdoc.swagger-ui.path: /swagger-ui
