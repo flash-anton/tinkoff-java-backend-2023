@@ -6,6 +6,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.Test;
 import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TgBotTest
@@ -15,7 +17,7 @@ public class TgBotTest
 	{
 		// Arrange / Setup
 		ApplicationConfig config = new ApplicationConfig( null, null );
-		TgBot tgBot = new TgBot( config );
+		TgBot tgBot = new TgBot( config, new ArrayList<>() );
 		Update update = BotUtils.parseUpdate( "{\"message\"={\"text\"=\"/unknownCommand\",\"chat\"={\"id\"=0}}}" );
 
 		// Act

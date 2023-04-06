@@ -2,7 +2,9 @@ package ru.tinkoff.edu.java.bot.tg;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TgCommandHelp implements TgCommand
 {
 	private String help;

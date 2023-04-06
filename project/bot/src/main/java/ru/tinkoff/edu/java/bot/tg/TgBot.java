@@ -6,33 +6,30 @@ import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetMyCommands;
+import org.springframework.stereotype.Component;
 import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class TgBot implements AutoCloseable
 {
 	private final ApplicationConfig config;
 	private final List<TgCommand> commands;
 	private TelegramBot bot;
 
-	public TgBot( ApplicationConfig config )
+	public TgBot( ApplicationConfig config, List<TgCommand> commands )
 	{
 		this.config = config;
+		this.commands = commands;
 
-		TgCommandHelp tgCommandHelp = new TgCommandHelp();
-
-		commands = List.of(
-			new TgCommandStart( config ),
-			tgCommandHelp,
-			new TgCommandTrack( config ),
-			new TgCommandUntrack( config ),
-			new TgCommandList( config )
-		);
-
-		tgCommandHelp.setHelp( buildHelp( commands ) );
+		commands.parallelStream()
+				.filter( TgCommandHelp.class::isInstance )
+				.map( TgCommandHelp.class::cast )
+				.findAny()
+				.ifPresent( cmd -> cmd.setHelp( buildHelp( commands ) ) );
 	}
 
 	public void start()
