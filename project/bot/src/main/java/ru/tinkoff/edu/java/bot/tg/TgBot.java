@@ -6,10 +6,11 @@ import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetMyCommands;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ public class TgBot implements AutoCloseable
 {
 	private final ApplicationConfig config;
 	private final List<TgCommand> commands;
+	private final Logger logger = LogManager.getLogger();
 	private TelegramBot bot;
 
 	public TgBot( ApplicationConfig config, List<TgCommand> commands )
@@ -105,8 +107,7 @@ public class TgBot implements AutoCloseable
 		int updateId = update.updateId();
 		long chatId = update.message().chat().id();
 		String text = update.message().text();
-		System.out.printf( "%s  TG_BOT  chatId=%d  updateId=%d  text=%s\n",
-			OffsetDateTime.now(), chatId, updateId, text );
+		logger.info( "updateId={} chatId={} text={}", updateId, chatId, text );
 	}
 
 	private TgCommand findCommand( Update update )
