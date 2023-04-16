@@ -1,6 +1,7 @@
 app:
   test: 111
   scheduler.interval: PT5S
+
 clients:
   github:
     defaultBaseUrl: https://api.github.com
@@ -10,4 +11,9 @@ clients:
   stackoverflow:
     defaultBaseUrl: https://api.stackexchange.com/2.3
     compress: true
+
+spring:
+  liquibase:
+    enabled: false
+
 springdoc.swagger-ui.path: /swagger-ui

@@ -15,3 +15,15 @@ create table if not exists chat_link
     link_url text references link on delete cascade,
     primary key( chat_id, link_url )
 );
+
+-- trigger
+create or replace function remove_unreferenced_links() returns trigger as $$
+begin
+    delete from link l where not exists (select from chat_link cl where cl.link_url = l.url);
+    return null;
+end;
+$$ language plpgsql;
+
+create trigger remove_unreferenced_links
+after delete on chat_link
+execute procedure remove_unreferenced_links();
