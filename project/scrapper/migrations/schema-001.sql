@@ -12,5 +12,6 @@ create table if not exists link
 create table if not exists chat_link
 (
     chat_id  bigint references chat on delete cascade,
-    link_url text references link on delete cascade
+    link_url text references link on delete cascade,
+    primary key( chat_id, link_url )
 );
