@@ -7,6 +7,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
+import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
 import ru.tinkoff.edu.java.scrapper.webclient.StackOverflowClient;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Validated
 @ConfigurationProperties( prefix = "clients" )
-public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonNull WebClientDefaultConfig stackoverflow )
+public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonNull WebClientDefaultConfig stackoverflow, @NonNull WebClientDefaultConfig bot )
 {
 	@Bean
 	public GitHubClient gitHubClient()
@@ -27,6 +28,12 @@ public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonN
 	public StackOverflowClient stackOverflowClient()
 	{
 		return new StackOverflowClient( stackoverflow.toWebClient( null ) );
+	}
+
+	@Bean
+	public BotClient botClient()
+	{
+		return new BotClient( bot.defaultBaseUrl );
 	}
 
 	private record WebClientDefaultConfig( @NonNull String defaultBaseUrl, Map<String, String> defaultHeaders, Boolean compress )
@@ -44,7 +51,7 @@ public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonN
 
 			if( Objects.requireNonNullElse( compress, false ) )
 			{
-				HttpClient httpClient = HttpClient.create().compress( compress );
+				HttpClient httpClient = HttpClient.create().compress( true );
 				builder.clientConnector( new ReactorClientHttpConnector( httpClient ) );
 			}
 

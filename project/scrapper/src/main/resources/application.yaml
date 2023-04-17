@@ -11,6 +11,8 @@ clients:
   stackoverflow:
     defaultBaseUrl: https://api.stackexchange.com/2.3
     compress: true
+  bot:
+    defaultBaseUrl: http://localhost:8081
 
 spring:
   liquibase:
