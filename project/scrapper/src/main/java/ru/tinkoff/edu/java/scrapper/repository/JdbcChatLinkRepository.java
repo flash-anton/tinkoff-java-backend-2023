@@ -17,6 +17,7 @@ public class JdbcChatLinkRepository
 	public static final String SQL_INSERT = "insert into chat_link (chat_id, link_url) values (?,?) on conflict do nothing";
 	public static final String SQL_DELETE = "delete from chat_link where (chat_id = ?) and (link_url = ?)";
 	public static final String SQL_SELECT_ALL = "select chat_id, link_url from chat_link";
+	public static final String SQL_SELECT_BY_CHAT_ID = "select chat_id, link_url from chat_link where chat_id = ?";
 
 	public static final RowMapper<ChatLink> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
 	{
@@ -40,5 +41,10 @@ public class JdbcChatLinkRepository
 	public @NonNull List<ChatLink> findAll()
 	{
 		return jdbcTemplate.query( SQL_SELECT_ALL, ROW_MAPPER );
+	}
+
+	public @NonNull List<ChatLink> findByChatId( long tgChatId )
+	{
+		return jdbcTemplate.query( SQL_SELECT_BY_CHAT_ID, ROW_MAPPER, tgChatId );
 	}
 }

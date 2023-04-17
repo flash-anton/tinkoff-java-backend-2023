@@ -113,6 +113,36 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		assertExists( expected );
 	}
 
+	@Transactional
+	@Rollback
+	@Test
+	void findByChatIdTest()
+	{
+		// given
+		ChatLink chat1Link1 = generateChatLink();
+		initTables( chat1Link1 );
+		jdbcTemplateAdd( chat1Link1 );
+
+		ChatLink chat2Link2 = generateChatLink();
+		initTables( chat2Link2 );
+		jdbcTemplateAdd( chat2Link2 );
+
+		ChatLink chat1Link2 = new ChatLink( chat1Link1.chat_id(), chat2Link2.link_url() );
+		jdbcTemplateAdd( chat1Link2 );
+
+		// when
+		List<ChatLink> expected = jdbcChatLinkRepository.findByChatId( chat1Link2.chat_id() );
+
+		// then
+		assertEquals( expected.size(), 2 );
+		assertTrue( expected.contains( chat1Link1 ) );
+		assertTrue( expected.contains( chat1Link2 ) );
+
+		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_CHAT_ID, JdbcChatLinkRepository.ROW_MAPPER, chat1Link2.chat_id() );
+		assertEquals( expected.size(), actual.size() );
+		assertTrue( expected.containsAll( actual ) );
+	}
+
 	private void assertExists( ChatLink... expected )
 	{
 		assertExists( List.of( expected ) );
