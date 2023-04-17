@@ -17,6 +17,7 @@ public class JdbcLinkRepository
 {
 	public static final String SQL_INSERT = "insert into link (url) values (?) on conflict do nothing";
 	public static final String SQL_DELETE = "delete from link where url = ?";
+	public static final String SQL_UPDATE = "update link set updated = ? where url = ?";
 	public static final String SQL_SELECT_ALL = "select url, updated from link";
 
 	public static final RowMapper<Link> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
@@ -36,6 +37,11 @@ public class JdbcLinkRepository
 	public boolean remove( @NonNull String url )
 	{
 		return jdbcTemplate.update( SQL_DELETE, url ) == 1;
+	}
+
+	public boolean update( @NonNull String url, @NonNull OffsetDateTime updated )
+	{
+		return jdbcTemplate.update( SQL_UPDATE, updated, url ) == 1;
 	}
 
 	public @NonNull List<Link> findAll()

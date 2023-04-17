@@ -18,6 +18,7 @@ public class JdbcChatLinkRepository
 	public static final String SQL_DELETE = "delete from chat_link where (chat_id = ?) and (link_url = ?)";
 	public static final String SQL_SELECT_ALL = "select chat_id, link_url from chat_link";
 	public static final String SQL_SELECT_BY_CHAT_ID = "select chat_id, link_url from chat_link where chat_id = ?";
+	public static final String SQL_SELECT_BY_URL = "select chat_id, link_url from chat_link where link_url = ?";
 
 	public static final RowMapper<ChatLink> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
 	{
@@ -46,5 +47,10 @@ public class JdbcChatLinkRepository
 	public @NonNull List<ChatLink> findByChatId( long tgChatId )
 	{
 		return jdbcTemplate.query( SQL_SELECT_BY_CHAT_ID, ROW_MAPPER, tgChatId );
+	}
+
+	public @NonNull List<ChatLink> findByUrl( @NonNull String url )
+	{
+		return jdbcTemplate.query( SQL_SELECT_BY_URL, ROW_MAPPER, url );
 	}
 }

@@ -119,26 +119,32 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 	void findByChatIdTest()
 	{
 		// given
-		ChatLink chat1Link1 = generateChatLink();
-		initTables( chat1Link1 );
-		jdbcTemplateAdd( chat1Link1 );
-
-		ChatLink chat2Link2 = generateChatLink();
-		initTables( chat2Link2 );
-		jdbcTemplateAdd( chat2Link2 );
-
-		ChatLink chat1Link2 = new ChatLink( chat1Link1.chat_id(), chat2Link2.link_url() );
-		jdbcTemplateAdd( chat1Link2 );
+		beforeFindBy();
+		long chatId = chatLink.chat_id();
 
 		// when
-		List<ChatLink> expected = jdbcChatLinkRepository.findByChatId( chat1Link2.chat_id() );
+		List<ChatLink> expected = jdbcChatLinkRepository.findByChatId( chatId );
 
 		// then
-		assertEquals( expected.size(), 2 );
-		assertTrue( expected.contains( chat1Link1 ) );
-		assertTrue( expected.contains( chat1Link2 ) );
+		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_CHAT_ID, JdbcChatLinkRepository.ROW_MAPPER, chatId );
+		assertEquals( expected.size(), actual.size() );
+		assertTrue( expected.containsAll( actual ) );
+	}
 
-		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_CHAT_ID, JdbcChatLinkRepository.ROW_MAPPER, chat1Link2.chat_id() );
+	@Transactional
+	@Rollback
+	@Test
+	void findByUrlTest()
+	{
+		// given
+		beforeFindBy();
+		String url = chatLink.link_url();
+
+		// when
+		List<ChatLink> expected = jdbcChatLinkRepository.findByUrl( url );
+
+		// then
+		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_URL, JdbcChatLinkRepository.ROW_MAPPER, url );
 		assertEquals( expected.size(), actual.size() );
 		assertTrue( expected.containsAll( actual ) );
 	}
@@ -164,6 +170,21 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 	{
 		jdbcTemplate.update( JdbcChatRepository.SQL_INSERT, chatLink.chat_id() );
 		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, chatLink.link_url() );
+	}
+
+	private void beforeFindBy()
+	{
+		List<ChatLink> chatLinks = Stream
+			.generate( this::generateChatLink )
+			.limit( 2 )
+			.peek( this::initTables )
+			.peek( this::jdbcTemplateAdd )
+			.toList();
+
+		long chatId = chatLinks.get( 0 ).chat_id();
+		String url = chatLinks.get( 1 ).link_url();
+		chatLink = new ChatLink( chatId, url );
+		jdbcTemplateAdd( chatLink );
 	}
 
 	private @NotNull ChatLink generateChatLink()

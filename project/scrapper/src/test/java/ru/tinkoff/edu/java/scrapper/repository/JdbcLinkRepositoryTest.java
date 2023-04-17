@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -92,6 +93,43 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		// then
 		assertTrue( result );
 		assertExists();
+	}
+
+	@Transactional
+	@Rollback
+	@Test
+	void updateIfNotExistsTest()
+	{
+		// given
+		OffsetDateTime updated = OffsetDateTime.now();
+
+		// when
+		boolean result = jdbcLinkRepository.update( url, updated );
+
+		// then
+		assertFalse( result );
+
+		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER );
+		assertTrue( actual.isEmpty() );
+	}
+
+	@Transactional
+	@Rollback
+	@Test
+	void updateIfExistsTest()
+	{
+		// given
+		jdbcTemplateAdd( url );
+		OffsetDateTime updated = OffsetDateTime.parse( "2023-04-18T02:09:00+00:00" );
+
+		// when
+		boolean result = jdbcLinkRepository.update( url, updated );
+
+		// then
+		assertTrue( result );
+
+		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER );
+		assertEquals( List.of( new Link( url, updated ) ), actual );
 	}
 
 	@Transactional
