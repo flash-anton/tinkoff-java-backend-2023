@@ -19,6 +19,7 @@ public class JdbcLinkRepository
 	public static final String SQL_DELETE = "delete from link where url = ?";
 	public static final String SQL_UPDATE = "update link set updated = ? where url = ?";
 	public static final String SQL_SELECT_ALL = "select url, updated from link";
+	public static final String SQL_SELECT_OLD = "select url, updated from link where updated < ?";
 
 	public static final RowMapper<Link> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
 	{
@@ -47,5 +48,10 @@ public class JdbcLinkRepository
 	public @NonNull List<Link> findAll()
 	{
 		return jdbcTemplate.query( SQL_SELECT_ALL, ROW_MAPPER );
+	}
+
+	public @NonNull List<Link> findOld( @NonNull OffsetDateTime updatedBefore )
+	{
+		return jdbcTemplate.query( SQL_SELECT_OLD, ROW_MAPPER, updatedBefore );
 	}
 }

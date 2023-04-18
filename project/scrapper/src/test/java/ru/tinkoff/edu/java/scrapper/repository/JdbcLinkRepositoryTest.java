@@ -1,5 +1,6 @@
 package ru.tinkoff.edu.java.scrapper.repository;
 
+import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import ru.tinkoff.edu.java.scrapper.entity.Link;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -149,6 +151,30 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		assertExists( expected.stream().map( Link::url ).toList() );
 	}
 
+	@Transactional
+	@Rollback
+	@Test
+	void findOldTest()
+	{
+		// given
+		Stream.generate( () -> "url-" + new Random().nextLong( 1_000_000 ) )
+			  .limit( 100 )
+			  .peek( this::jdbcTemplateAdd )
+			  .forEach( url ->
+				  IntStream.range( 1970, 2023 ).forEach( year ->
+					  jdbcTemplateUpdate( url, OffsetDateTime.parse( year + "-04-18T02:09:00+00:00" ) ) ) );
+
+		OffsetDateTime updatedBefore = OffsetDateTime.parse( "2000-04-18T02:09:00+00:00" );
+
+		// when
+		List<Link> expected = jdbcLinkRepository.findOld( updatedBefore );
+
+		// then
+		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_OLD, JdbcLinkRepository.ROW_MAPPER, updatedBefore );
+		assertEquals( expected.size(), actual.size() );
+		assertTrue( expected.containsAll( actual ) );
+	}
+
 	private void assertExists( String... expected )
 	{
 		assertExists( List.of( expected ) );
@@ -162,8 +188,13 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		assertTrue( expected.containsAll( actual ) );
 	}
 
-	private void jdbcTemplateAdd( String url )
+	private void jdbcTemplateAdd( @NonNull String url )
 	{
 		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, url );
+	}
+
+	private void jdbcTemplateUpdate( @NonNull String url, @NonNull OffsetDateTime updated )
+	{
+		jdbcTemplate.update( JdbcLinkRepository.SQL_UPDATE, updated, url );
 	}
 }

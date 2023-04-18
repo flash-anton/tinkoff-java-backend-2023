@@ -62,10 +62,6 @@ public class JdbcLinkService implements LinkService
 	@Override
 	public @NonNull List<Link> getLinks( @NonNull OffsetDateTime updatedBefore )
 	{
-		return jdbcLinkRepository
-			.findAll()
-			.parallelStream()
-			.filter( link -> link.updated().isBefore( updatedBefore ) )
-			.toList();
+		return jdbcLinkRepository.findOld( updatedBefore );
 	}
 }
