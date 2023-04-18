@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
+import ru.tinkoff.edu.java.bot.scrapperclient.exception.ApiErrorException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,7 +76,16 @@ public class TgBot implements AutoCloseable
 		{
 			return new SendMessage( chatId, "Команда не поддерживается" );
 		}
-		return command.process( update );
+
+		try
+		{
+			return command.process( update );
+		}
+		catch( ApiErrorException ex )
+		{
+			logger.error( ex.getMessage() );
+			return new SendMessage( chatId, "Ошибка" );
+		}
 	}
 
 	public void sendMessage( SendMessage message )

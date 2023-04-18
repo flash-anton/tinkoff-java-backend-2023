@@ -16,7 +16,7 @@ public class TgBotTest
 	void unknownCommandTest()
 	{
 		// Arrange / Setup
-		ApplicationConfig config = new ApplicationConfig( null, null );
+		ApplicationConfig config = new ApplicationConfig( "", "", "" );
 		TgBot tgBot = new TgBot( config, new ArrayList<>() );
 		Update update = BotUtils.parseUpdate( "{\"message\"={\"text\"=\"/unknownCommand\",\"chat\"={\"id\"=0}}}" );
 

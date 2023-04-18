@@ -1,23 +1,20 @@
 package ru.tinkoff.edu.java.bot.configuration;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 @ComponentScan
-public record ApplicationConfig( @NotNull String test, @NotNull String telegramToken )
+public record ApplicationConfig( @NonNull String test, @NonNull String telegramToken, @NonNull String scrapperBaseUrl )
 {
-	private static final ConcurrentMap<Long, Set<String> > users = new ConcurrentHashMap<>();
-
-	public ConcurrentMap<Long, Set<String> > getTgUsers()
+	@Bean
+	public @NonNull ScrapperClient scrapperClient()
 	{
-		return users;
+		return new ScrapperClient( scrapperBaseUrl );
 	}
 }

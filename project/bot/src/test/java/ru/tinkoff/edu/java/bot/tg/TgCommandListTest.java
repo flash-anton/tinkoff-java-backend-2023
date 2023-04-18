@@ -4,7 +4,7 @@ import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.Test;
-import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
+import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
 import java.util.Set;
 
@@ -39,12 +39,13 @@ public class TgCommandListTest
 	void urlsTest( long chatId, Set<String> urls )
 	{
 		// Arrange / Setup
-		ApplicationConfig config = new ApplicationConfig( null, null );
+		ScrapperClient scrapperClient = new ScrapperClient( "http://localhost:8080" );
+		scrapperClient.addChat( chatId );
 		if( urls != null )
 		{
-			config.getTgUsers().put( chatId, urls );
+			urls.forEach( url -> scrapperClient.addLink( chatId, url ) );
 		}
-		TgCommandList cmd = new TgCommandList( config );
+		TgCommandList cmd = new TgCommandList( scrapperClient );
 
 		Update update = BotUtils.parseUpdate( "{\"message\"={\"chat\"={\"id\"=" + chatId +"}}}" );
 

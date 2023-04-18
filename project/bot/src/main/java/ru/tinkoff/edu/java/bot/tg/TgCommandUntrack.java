@@ -2,18 +2,15 @@ package ru.tinkoff.edu.java.bot.tg;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
+import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
 @Component
+@RequiredArgsConstructor
 public class TgCommandUntrack implements TgCommand
 {
-	private final ApplicationConfig config;
-
-	public TgCommandUntrack( ApplicationConfig config )
-	{
-		this.config = config;
-	}
+	private final ScrapperClient scrapperClient;
 
 	@Override
 	public String name()
@@ -39,16 +36,7 @@ public class TgCommandUntrack implements TgCommand
 		}
 
 		String url = parts[1];
-		config.getTgUsers().compute( chatId, (k,v) ->
-		{
-			if( v == null )
-			{
-				return null;
-			}
-			v.removeIf( url::equals );
-			return v;
-		});
-
+		scrapperClient.deleteLink( chatId, url );
 		return new SendMessage( chatId, "Отслеживание ссылки прекращено" );
 	}
 }
