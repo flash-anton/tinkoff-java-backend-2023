@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import ru.tinkoff.edu.java.linkparser.LinkContent;
 import ru.tinkoff.edu.java.linkparser.LinkParser;
 import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
-import ru.tinkoff.edu.java.scrapper.dto.GitHubRepositoryInfoResponse;
+import ru.tinkoff.edu.java.scrapper.dto.LinkChanges;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.service.LinkService;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
@@ -71,19 +71,17 @@ public class LinkUpdaterScheduler
 	private void processLink( @NonNull Link link )
 	{
 		String url = link.url();
-		OffsetDateTime updatedOld = link.updated();
-		long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
 		LinkContent linkContent = linkParser.parse( URI.create( url ) );
+		OffsetDateTime lastUpdated = link.updated();
 
-		OffsetDateTime updated;
+		LinkChanges linkChanges;
 		if( linkContent instanceof LinkContent.StackOverflowLinkContent so )
 		{
-			updated = stackOverflowClient.fetchQuestionInfo( so.questionId() ).last_activity_date();
+			linkChanges = stackOverflowClient.fetchQuestionInfo( so.questionId(), lastUpdated ).linkChanges();
 		}
 		else if( linkContent instanceof LinkContent.GitHubLinkContent gh )
 		{
-			GitHubRepositoryInfoResponse info = gitHubClient.fetchRepositoryInfo( gh.user(), gh.repository() );
-			updated = info.updated_at().isAfter( info.pushed_at() ) ? info.updated_at() : info.pushed_at();
+			linkChanges = gitHubClient.fetchRepositoryInfo( gh.user(), gh.repository(), lastUpdated ).linkChanges();
 		}
 		else
 		{
@@ -91,10 +89,11 @@ public class LinkUpdaterScheduler
 			return;
 		}
 
-		if( updated.isAfter( updatedOld ) )
+		if( !linkChanges.events().isEmpty() )
 		{
-			linkService.update( url, updated );
-			botClient.linkUpdate( "Ресурс обновлен " + updated, url, chatIds );
+			long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
+			linkService.update( url, linkChanges.last().time() );
+			botClient.linkUpdate( linkChanges.toString(), url, chatIds );
 		}
 	}
 }
