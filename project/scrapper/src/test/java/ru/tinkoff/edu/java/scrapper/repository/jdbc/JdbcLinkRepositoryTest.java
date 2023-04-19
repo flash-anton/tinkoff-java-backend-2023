@@ -1,12 +1,9 @@
-package ru.tinkoff.edu.java.scrapper.repository;
+package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
@@ -20,13 +17,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
-	private JdbcLinkRepository jdbcLinkRepository;
 	private String url;
 
 	@BeforeEach
@@ -43,7 +35,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcLinkRepository.add( url );
+		boolean result = linkRepository.add( url );
 
 		// then
 		assertTrue( result );
@@ -59,7 +51,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( url );
 
 		// when
-		boolean result = jdbcLinkRepository.add( url );
+		boolean result = linkRepository.add( url );
 
 		// then
 		assertFalse( result );
@@ -74,7 +66,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcLinkRepository.remove( url );
+		boolean result = linkRepository.remove( url );
 
 		// then
 		assertFalse( result );
@@ -90,7 +82,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( url );
 
 		// when
-		boolean result = jdbcLinkRepository.remove( url );
+		boolean result = linkRepository.remove( url );
 
 		// then
 		assertTrue( result );
@@ -106,7 +98,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		OffsetDateTime updated = OffsetDateTime.now();
 
 		// when
-		boolean result = jdbcLinkRepository.update( url, updated );
+		boolean result = linkRepository.update( url, updated );
 
 		// then
 		assertFalse( result );
@@ -125,7 +117,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		OffsetDateTime updated = OffsetDateTime.parse( "2023-04-18T02:09:00+00:00" );
 
 		// when
-		boolean result = jdbcLinkRepository.update( url, updated );
+		boolean result = linkRepository.update( url, updated );
 
 		// then
 		assertTrue( result );
@@ -145,7 +137,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 			  .forEach( this::jdbcTemplateAdd );
 
 		// when
-		List<Link> expected = jdbcLinkRepository.findAll();
+		List<Link> expected = linkRepository.findAll();
 
 		// then
 		assertExists( expected.stream().map( Link::url ).toList() );
@@ -167,7 +159,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment
 		OffsetDateTime updatedBefore = OffsetDateTime.parse( "2000-04-18T02:09:00+00:00" );
 
 		// when
-		List<Link> expected = jdbcLinkRepository.findOld( updatedBefore );
+		List<Link> expected = linkRepository.findOld( updatedBefore );
 
 		// then
 		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_OLD, JdbcLinkRepository.ROW_MAPPER, updatedBefore );

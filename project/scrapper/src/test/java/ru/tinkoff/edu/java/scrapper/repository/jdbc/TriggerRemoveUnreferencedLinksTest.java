@@ -1,11 +1,8 @@
-package ru.tinkoff.edu.java.scrapper.repository;
+package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
@@ -16,12 +13,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 public class TriggerRemoveUnreferencedLinksTest extends IntegrationEnvironment
 {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-
 	private final long CHAT_WITH_COMMON_URL = 1;
 	private final long CHAT_WITH_BOTH_URLS = 2;
 	private final String COMMON_URL = "url-common";

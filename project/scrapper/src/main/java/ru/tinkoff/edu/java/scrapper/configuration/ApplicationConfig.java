@@ -20,7 +20,7 @@ public record ApplicationConfig( @NotNull String test, @NotNull Scheduler schedu
 	}
 
 	@Bean
-	public LinkParser linkParser()
+	public @NotNull LinkParser linkParser()
 	{
 		LinkParser linkParser = new StackOverflowLinkParser();
 		linkParser.setNext( new GitHubLinkParser() );

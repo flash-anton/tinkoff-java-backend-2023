@@ -1,11 +1,8 @@
-package ru.tinkoff.edu.java.scrapper.repository;
+package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
@@ -17,13 +14,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
-	private JdbcChatLinkRepository jdbcChatLinkRepository;
 	private ChatLink chatLink;
 
 	@BeforeEach
@@ -41,7 +33,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcChatLinkRepository.add( chatLink.chat_id(), chatLink.link_url() );
+		boolean result = chatLinkRepository.add( chatLink.chat_id(), chatLink.link_url() );
 
 		// then
 		assertTrue( result );
@@ -57,7 +49,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( chatLink );
 
 		// when
-		boolean result = jdbcChatLinkRepository.add( chatLink.chat_id(), chatLink.link_url() );
+		boolean result = chatLinkRepository.add( chatLink.chat_id(), chatLink.link_url() );
 
 		// then
 		assertFalse( result );
@@ -72,7 +64,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcChatLinkRepository.remove( chatLink.chat_id(), chatLink.link_url() );
+		boolean result = chatLinkRepository.remove( chatLink.chat_id(), chatLink.link_url() );
 
 		// then
 		assertFalse( result );
@@ -88,7 +80,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( chatLink );
 
 		// when
-		boolean result = jdbcChatLinkRepository.remove( chatLink.chat_id(), chatLink.link_url() );
+		boolean result = chatLinkRepository.remove( chatLink.chat_id(), chatLink.link_url() );
 
 		// then
 		assertTrue( result );
@@ -107,7 +99,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 			  .forEach( this::jdbcTemplateAdd );
 
 		// when
-		List<ChatLink> expected = jdbcChatLinkRepository.findAll();
+		List<ChatLink> expected = chatLinkRepository.findAll();
 
 		// then
 		assertExists( expected );
@@ -123,7 +115,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		long chatId = chatLink.chat_id();
 
 		// when
-		List<ChatLink> expected = jdbcChatLinkRepository.findByChatId( chatId );
+		List<ChatLink> expected = chatLinkRepository.findByChatId( chatId );
 
 		// then
 		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_CHAT_ID, JdbcChatLinkRepository.ROW_MAPPER, chatId );
@@ -141,7 +133,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
 		String url = chatLink.link_url();
 
 		// when
-		List<ChatLink> expected = jdbcChatLinkRepository.findByUrl( url );
+		List<ChatLink> expected = chatLinkRepository.findByUrl( url );
 
 		// then
 		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_URL, JdbcChatLinkRepository.ROW_MAPPER, url );

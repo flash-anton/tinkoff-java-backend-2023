@@ -1,11 +1,8 @@
-package ru.tinkoff.edu.java.scrapper.repository;
+package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
@@ -15,13 +12,8 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class JdbcChatRepositoryTest extends IntegrationEnvironment
 {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
-	private JdbcChatRepository jdbcChatRepository;
 	private long chatId;
 
 	@BeforeEach
@@ -38,7 +30,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcChatRepository.add( chatId );
+		boolean result = chatRepository.add( chatId );
 
 		// then
 		assertTrue( result );
@@ -54,7 +46,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( chatId );
 
 		// when
-		boolean result = jdbcChatRepository.add( chatId );
+		boolean result = chatRepository.add( chatId );
 
 		// then
 		assertFalse( result );
@@ -69,7 +61,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment
 		// given
 
 		// when
-		boolean result = jdbcChatRepository.remove( chatId );
+		boolean result = chatRepository.remove( chatId );
 
 		// then
 		assertFalse( result );
@@ -85,7 +77,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment
 		jdbcTemplateAdd( chatId );
 
 		// when
-		boolean result = jdbcChatRepository.remove( chatId );
+		boolean result = chatRepository.remove( chatId );
 
 		// then
 		assertTrue( result );
@@ -101,7 +93,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment
 		new Random().longs( 100 ).forEach( this::jdbcTemplateAdd );
 
 		// when
-		List<Long> expected = jdbcChatRepository.findAll();
+		List<Long> expected = chatRepository.findAll();
 
 		// then
 		assertExists( expected );

@@ -1,4 +1,4 @@
-package ru.tinkoff.edu.java.scrapper.service.jdbc;
+package ru.tinkoff.edu.java.scrapper.service.jook;
 
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,13 +9,13 @@ import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 import ru.tinkoff.edu.java.scrapper.service.LinkService;
 
 @Service
-@Qualifier( "JdbcLinkService" )
-public class JdbcLinkService extends LinkService
+@Qualifier( "JooqLinkService" )
+public class JooqLinkService extends LinkService
 {
-	public JdbcLinkService(
-		@NonNull @Qualifier( "JdbcChatRepository" ) ChatRepository chatRepository,
-		@NonNull @Qualifier( "JdbcChatLinkRepository" ) ChatLinkRepository chatLinkRepository,
-		@NonNull @Qualifier( "JdbcLinkRepository" ) LinkRepository linkRepository )
+	public JooqLinkService(
+		@NonNull @Qualifier( "JooqChatRepository" ) ChatRepository chatRepository,
+		@NonNull @Qualifier( "JooqChatLinkRepository" ) ChatLinkRepository chatLinkRepository,
+		@NonNull @Qualifier( "JooqLinkRepository" ) LinkRepository linkRepository )
 	{
 		super( chatRepository, chatLinkRepository, linkRepository );
 	}

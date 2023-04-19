@@ -1,11 +1,13 @@
-package ru.tinkoff.edu.java.scrapper.repository;
+package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
+import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
@@ -13,7 +15,8 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class JdbcLinkRepository
+@Qualifier( "JdbcLinkRepository" )
+public class JdbcLinkRepository implements LinkRepository
 {
 	public static final String SQL_INSERT = "insert into link (url) values (?) on conflict do nothing";
 	public static final String SQL_DELETE = "delete from link where url = ?";
@@ -22,34 +25,35 @@ public class JdbcLinkRepository
 	public static final String SQL_SELECT_OLD = "select url, updated from link where updated < ?";
 
 	public static final RowMapper<Link> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
-	{
-		String url = rs.getString( "url" );
-		OffsetDateTime updated = rs.getObject( "updated", OffsetDateTime.class );
-		return new Link( url, updated );
-	};
+		new Link( rs.getString( "url" ), rs.getObject( "updated", OffsetDateTime.class ) );
 
 	private final JdbcTemplate jdbcTemplate;
 
+	@Override
 	public boolean add( @NonNull String url )
 	{
 		return jdbcTemplate.update( SQL_INSERT, url ) == 1;
 	}
 
+	@Override
 	public boolean remove( @NonNull String url )
 	{
 		return jdbcTemplate.update( SQL_DELETE, url ) == 1;
 	}
 
+	@Override
 	public boolean update( @NonNull String url, @NonNull OffsetDateTime updated )
 	{
 		return jdbcTemplate.update( SQL_UPDATE, updated, url ) == 1;
 	}
 
+	@Override
 	public @NonNull List<Link> findAll()
 	{
 		return jdbcTemplate.query( SQL_SELECT_ALL, ROW_MAPPER );
 	}
 
+	@Override
 	public @NonNull List<Link> findOld( @NonNull OffsetDateTime updatedBefore )
 	{
 		return jdbcTemplate.query( SQL_SELECT_OLD, ROW_MAPPER, updatedBefore );

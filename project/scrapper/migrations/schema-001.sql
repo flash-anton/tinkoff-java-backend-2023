@@ -6,7 +6,7 @@ create table if not exists chat
 create table if not exists link
 (
     url     text primary key,
-    updated timestamptz default '1970-01-01T00:00:00Z'
+    updated timestamptz not null default '1970-01-01T00:00:00Z'
 );
 
 create table if not exists chat_link

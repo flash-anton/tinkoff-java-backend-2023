@@ -1,31 +1,37 @@
 package ru.tinkoff.edu.java.scrapper.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.tinkoff.edu.java.scrapper.dto.AddLinkRequest;
 import ru.tinkoff.edu.java.scrapper.dto.LinkResponse;
 import ru.tinkoff.edu.java.scrapper.dto.ListLinksResponse;
 import ru.tinkoff.edu.java.scrapper.dto.RemoveLinkRequest;
-import ru.tinkoff.edu.java.scrapper.exception.BadRequestException;
 import ru.tinkoff.edu.java.scrapper.service.ChatService;
 import ru.tinkoff.edu.java.scrapper.service.LinkService;
 
+import java.util.Comparator;
+
 @RestController
-@RequiredArgsConstructor
 public class ScrapperController
 {
 	private final ChatService chatService;
 	private final LinkService linkService;
 
+	public ScrapperController(
+		@NonNull @Qualifier( "JooqChatService" ) ChatService chatService,
+		@NonNull @Qualifier( "JooqLinkService" ) LinkService linkService )
+	{
+		this.chatService = chatService;
+		this.linkService = linkService;
+	}
+
 	// Зарегистрировать чат
 	@PostMapping( "/tg-chat/{id}" )
 	public void addChat( @PathVariable long id )
 	{
-		if( id == 400 )
-		{
-			throw new BadRequestException( "id == 400" );
-			// TODO: /tg-chat/{id} POST responses: Добавить: Чат уже зарегистрирован
-		}
+		// 400, BadRequestException
+		// TODO: /tg-chat/{id} POST responses: Добавить: Чат уже зарегистрирован
 		// 200, Чат зарегистрирован
 		chatService.add( id );
 	}
@@ -34,10 +40,7 @@ public class ScrapperController
 	@DeleteMapping( "/tg-chat/{id}" )
 	public void deleteChat( @PathVariable long id )
 	{
-		if( id == 400 )
-		{
-			throw new BadRequestException( "id == 400" );
-		}
+		// 400, BadRequestException
 		// 200, Чат успешно удалён
 		chatService.delete( id );
 	}
@@ -46,17 +49,14 @@ public class ScrapperController
 	@GetMapping( "/links" )
 	public ListLinksResponse getAllLinks( @RequestHeader( "Tg-Chat-Id" ) long id )
 	{
-		if( id == 400 )
-		{
-			throw new BadRequestException( "id == 400" );
-			// TODO: /links GET responses: Добавить: Чат не существует
-		}
+		// 400, BadRequestException
+		// TODO: /links GET responses: Добавить: Чат не существует
 		// 200, Ссылки успешно получены
 		LinkResponse[] links = linkService
 			.getUrls( id )
 			.parallelStream()
-			.sorted()
 			.map( url -> new LinkResponse( id, url ) )
+			.sorted( Comparator.comparing( LinkResponse::url ) )
 			.toArray( LinkResponse[]::new );
 		return new ListLinksResponse( links, links.length );
 	}
@@ -65,12 +65,9 @@ public class ScrapperController
 	@PostMapping( "/links" )
 	public LinkResponse addLink( @RequestHeader( "Tg-Chat-Id" ) long id, @RequestBody AddLinkRequest req )
 	{
-		if( id == 400 )
-		{
-			throw new BadRequestException( "id == 400" );
-			// TODO: /links POST responses: Добавить: Чат не существует
-			// TODO: /links POST responses: Добавить: Ссылка уже добавлена
-		}
+		// 400, BadRequestException
+		// TODO: /links POST responses: Добавить: Чат не существует
+		// TODO: /links POST responses: Добавить: Ссылка уже добавлена
 		// 200, Ссылка успешно добавлена
 		linkService.add( id, req.link() );
 		// TODO: /links POST response 200 content: Удалить
@@ -81,11 +78,8 @@ public class ScrapperController
 	@DeleteMapping( "/links" )
 	public LinkResponse deleteLink( @RequestHeader( "Tg-Chat-Id" ) long id, @RequestBody RemoveLinkRequest req )
 	{
-		if( id == 400 )
-		{
-			throw new BadRequestException( "id == 400" );
-			// TODO: /links DELETE responses: Добавить: Чат не существует
-		}
+		// 400, BadRequestException
+		// TODO: /links DELETE responses: Добавить: Чат не существует
 		// 200, Ссылка успешно убрана
 		linkService.delete( id, req.link() );
 		// TODO: /links DELETE response 200 content: Удалить
