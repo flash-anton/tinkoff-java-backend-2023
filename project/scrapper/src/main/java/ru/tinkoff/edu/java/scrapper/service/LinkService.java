@@ -11,6 +11,7 @@ import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
 import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -23,14 +24,14 @@ public class LinkService
 	private final LinkRepository linkRepository;
 
 	@Transactional
-	public void add( long tgChatId, @NonNull String url )
+	public void add( long tgChatId, @NonNull URI url )
 	{
 		chatRepository.add( tgChatId ); // вместо исключения
 		linkRepository.add( url );
 		chatLinkRepository.add( tgChatId, url );
 	}
 
-	public void delete( long tgChatId, @NonNull String url )
+	public void delete( long tgChatId, @NonNull URI url )
 	{
 		if( !chatLinkRepository.remove( tgChatId, url ) )
 		{
@@ -38,17 +39,17 @@ public class LinkService
 		}
 	}
 
-	public void update( @NonNull String url, @NonNull OffsetDateTime updated )
+	public void update( @NonNull URI url, @NonNull OffsetDateTime updated )
 	{
 		linkRepository.update( url, updated );
 	}
 
-	public @NonNull List<String> getUrls( long tgChatId )
+	public @NonNull List<URI> getUrls( long tgChatId )
 	{
 		return chatLinkRepository.findByChatId( tgChatId ).stream().map( ChatLink::link_url ).toList();
 	}
 
-	public @NonNull List<Long> getChats( @NonNull String url )
+	public @NonNull List<Long> getChats( @NonNull URI url )
 	{
 		return chatLinkRepository.findByUrl( url ).stream().map( ChatLink::chat_id ).toList();
 	}

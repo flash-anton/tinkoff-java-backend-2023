@@ -8,11 +8,13 @@ import reactor.core.publisher.Mono;
 import ru.tinkoff.edu.java.scrapper.botclient.dto.LinkUpdateRequest;
 import ru.tinkoff.edu.java.scrapper.botclient.exception.ApiErrorException;
 
+import java.net.URI;
+
 public class BotClient
 {
 	protected final WebClient client;
 
-	public BotClient( @NonNull String baseUrl )
+	public BotClient( @NonNull URI baseUrl )
 	{
 		client = WebClient
 			.builder()
@@ -26,11 +28,11 @@ public class BotClient
 				}
 				return Mono.just( clientResponse );
 			} ) )
-			.baseUrl( baseUrl )
+			.baseUrl( baseUrl.toString() )
 			.build();
 	}
 
-	public void linkUpdate( @NonNull String description, @NonNull String url, long[] tgChatIds )
+	public void linkUpdate( @NonNull String description, @NonNull URI url, long[] tgChatIds )
 	{
 		LinkUpdateRequest req = new LinkUpdateRequest();
 		req.setUrl( url );

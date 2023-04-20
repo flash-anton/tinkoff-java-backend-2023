@@ -7,10 +7,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.validation.annotation.Validated;
 import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
+import java.net.URI;
+
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 @ComponentScan
-public record ApplicationConfig( @NonNull String test, @NonNull String telegramToken, @NonNull String scrapperBaseUrl )
+public record ApplicationConfig( @NonNull String test, @NonNull String telegramToken, @NonNull URI scrapperBaseUrl )
 {
 	@Bean
 	public @NonNull ScrapperClient scrapperClient()

@@ -6,7 +6,9 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.Test;
 import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,13 +17,13 @@ public class TgCommandListTest
 	@Test
 	void severalUrlsInUrlListTest()
 	{
-		urlsTest( 123461, Set.of( "0", "5", "2", "4", "1", "3" ) );
+		urlsTest( 123461, Set.of( 0, 5, 2, 4, 1, 3 ) );
 	}
 
 	@Test
 	void singleUrlInUrlListTest()
 	{
-		urlsTest( 74586345, Set.of( "0" ) );
+		urlsTest( 74586345, Set.of( 0 ) );
 	}
 
 	@Test
@@ -36,18 +38,24 @@ public class TgCommandListTest
 		urlsTest( 123125, null );
 	}
 
-	void urlsTest( long chatId, Set<String> urls )
+	void urlsTest( long chatId, Set<Integer> ports )
 	{
 		// Arrange / Setup
-		ScrapperClient scrapperClient = new ScrapperClient( "http://localhost:8080" );
-		scrapperClient.addChat( chatId );
-		if( urls != null )
+		Set<URI> urls = new HashSet<>();
+		if( ports != null && !ports.isEmpty() )
 		{
-			urls.forEach( url -> scrapperClient.addLink( chatId, url ) );
+			urls = ports
+				.parallelStream()
+				.map( port -> URI.create( "http://localhost:" + port ) )
+				.collect( Collectors.toSet() );
 		}
+
+		ScrapperClient scrapperClient = new ScrapperClient( URI.create( "http://localhost:8080" ) );
+		scrapperClient.addChat( chatId );
+		urls.forEach( url -> scrapperClient.addLink( chatId, url ) );
 		TgCommandList cmd = new TgCommandList( scrapperClient );
 
-		Update update = BotUtils.parseUpdate( "{\"message\"={\"chat\"={\"id\"=" + chatId +"}}}" );
+		Update update = BotUtils.parseUpdate( "{\"message\"={\"chat\"={\"id\"=" + chatId + "}}}" );
 
 
 		// Act
@@ -57,13 +65,13 @@ public class TgCommandListTest
 		// Assert
 		String text = (String)msg.getParameters().get( "text" );
 
-		if( urls != null && !urls.isEmpty() )
+		if( urls.isEmpty() )
 		{
-			assertEquals( urls, Set.of( text.split( "\n" ) ) );
+			assertEquals( "Список отслеживаемых ссылок пуст", text );
 		}
 		else
 		{
-			assertEquals( "Список отслеживаемых ссылок пуст", text );
+			assertEquals( urls, Arrays.stream( text.split( "\n" ) ).map( URI::create ).collect( Collectors.toSet() ) );
 		}
 	}
 }

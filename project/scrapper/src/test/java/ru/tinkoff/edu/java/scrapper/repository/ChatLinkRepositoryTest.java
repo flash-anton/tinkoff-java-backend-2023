@@ -11,6 +11,7 @@ import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -133,13 +134,13 @@ public class ChatLinkRepositoryTest extends IntegrationEnvironment
 	{
 		// given
 		beforeFindBy();
-		String url = chatLink.link_url();
+		URI url = chatLink.link_url();
 
 		// when
 		List<ChatLink> expected = chatLinkRepository.findByUrl( url );
 
 		// then
-		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_URL, JdbcChatLinkRepository.ROW_MAPPER, url );
+		List<ChatLink> actual = jdbcTemplate.query( JdbcChatLinkRepository.SQL_SELECT_BY_URL, JdbcChatLinkRepository.ROW_MAPPER, url.toString() );
 		assertEquals( expected.size(), actual.size() );
 		assertTrue( expected.containsAll( actual ) );
 	}
@@ -158,13 +159,13 @@ public class ChatLinkRepositoryTest extends IntegrationEnvironment
 
 	private void jdbcTemplateAdd( @NotNull ChatLink chatLink )
 	{
-		jdbcTemplate.update( JdbcChatLinkRepository.SQL_INSERT, chatLink.chat_id(), chatLink.link_url() );
+		jdbcTemplate.update( JdbcChatLinkRepository.SQL_INSERT, chatLink.chat_id(), chatLink.link_url().toString() );
 	}
 
 	private void initTables( @NotNull ChatLink chatLink )
 	{
 		jdbcTemplate.update( JdbcChatRepository.SQL_INSERT, chatLink.chat_id() );
-		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, chatLink.link_url() );
+		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, chatLink.link_url().toString() );
 	}
 
 	private void beforeFindBy()
@@ -177,7 +178,7 @@ public class ChatLinkRepositoryTest extends IntegrationEnvironment
 			.toList();
 
 		long chatId = chatLinks.get( 0 ).chat_id();
-		String url = chatLinks.get( 1 ).link_url();
+		URI url = chatLinks.get( 1 ).link_url();
 		chatLink = new ChatLink( chatId, url );
 		jdbcTemplateAdd( chatLink );
 	}
@@ -185,7 +186,7 @@ public class ChatLinkRepositoryTest extends IntegrationEnvironment
 	private @NotNull ChatLink generateChatLink()
 	{
 		long chat_id = new Random().nextLong( 1_000_000 );
-		String link_url = "url-" + new Random().nextLong( 1_000_000 );
+		URI link_url = URI.create( "url-" + new Random().nextLong( 1_000_000 ) );
 		return new ChatLink( chat_id, link_url );
 	}
 }

@@ -37,8 +37,6 @@ public class LinkUpdaterScheduler
 	@Scheduled( fixedDelayString = "#{@schedulerIntervalMs}" )
 	public void update()
 	{
-		printDb();
-
 		linkService
 			.getLinks( OffsetDateTime.now() )
 			.parallelStream()
@@ -53,6 +51,8 @@ public class LinkUpdaterScheduler
 					logger.error( ex );
 				}
 			} );
+
+		printDb();
 	}
 
 	private void printDb()
@@ -75,8 +75,8 @@ public class LinkUpdaterScheduler
 
 	private void processLink( @NonNull Link link )
 	{
-		String url = link.url();
-		LinkContent linkContent = linkParser.parse( URI.create( url ) );
+		URI url = link.url();
+		LinkContent linkContent = linkParser.parse( url );
 		OffsetDateTime lastUpdated = link.updated();
 
 		LinkChanges linkChanges;

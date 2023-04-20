@@ -12,6 +12,7 @@ import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
 import ru.tinkoff.edu.java.scrapper.webclient.StackOverflowClient;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,13 +38,13 @@ public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonN
 		return new BotClient( bot.defaultBaseUrl );
 	}
 
-	private record WebClientDefaultConfig( @NonNull String defaultBaseUrl, Map<String, String> defaultHeaders, Boolean compress )
+	private record WebClientDefaultConfig( @NonNull URI defaultBaseUrl, Map<String, String> defaultHeaders, Boolean compress )
 	{
-		public WebClient toWebClient( String baseUrl )
+		public WebClient toWebClient( URI baseUrl )
 		{
 			WebClient.Builder builder = WebClient.builder();
 
-			builder.baseUrl( Objects.requireNonNullElse( baseUrl, defaultBaseUrl ) );
+			builder.baseUrl( Objects.requireNonNullElse( baseUrl, defaultBaseUrl ).toString() );
 
 			if( defaultHeaders != null )
 			{

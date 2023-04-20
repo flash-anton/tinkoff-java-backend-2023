@@ -11,6 +11,7 @@ import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
+import java.net.URI;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,8 +96,12 @@ public class TriggerRemoveUnreferencedLinksTest extends IntegrationEnvironment
 
 	private void assertExists( @NonNull List<String> expected )
 	{
-		List<String> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER )
-										  .stream().map( Link::url ).toList();
+		List<String> actual = jdbcTemplate
+			.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER )
+			.stream()
+			.map( Link::url )
+			.map( URI::toString )
+			.toList();
 		assertEquals( expected.size(), actual.size() );
 		assertTrue( expected.containsAll( actual ) );
 	}

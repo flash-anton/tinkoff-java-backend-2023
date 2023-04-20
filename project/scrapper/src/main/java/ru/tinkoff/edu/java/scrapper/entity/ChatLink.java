@@ -2,6 +2,8 @@ package ru.tinkoff.edu.java.scrapper.entity;
 
 import lombok.NonNull;
 
-public record ChatLink( long chat_id, @NonNull String link_url )
+import java.net.URI;
+
+public record ChatLink( long chat_id, @NonNull URI link_url )
 {
 }

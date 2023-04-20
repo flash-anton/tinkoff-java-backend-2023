@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.RowMapper;
 import ru.tinkoff.edu.java.scrapper.entity.ChatLink;
 import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
 
+import java.net.URI;
 import java.sql.ResultSet;
 import java.util.List;
 
@@ -20,20 +21,20 @@ public class JdbcChatLinkRepository implements ChatLinkRepository
 	public static final String SQL_SELECT_BY_URL = "select chat_id, link_url from chat_link where link_url = ?";
 
 	public static final RowMapper<ChatLink> ROW_MAPPER = ( ResultSet rs, int rowNum ) ->
-		new ChatLink( rs.getLong( "chat_id" ), rs.getString( "link_url" ) );
+		new ChatLink( rs.getLong( "chat_id" ), URI.create( rs.getString( "link_url" ) ) );
 
 	private final JdbcTemplate jdbcTemplate;
 
 	@Override
-	public boolean add( long tgChatId, @NonNull String url )
+	public boolean add( long tgChatId, @NonNull URI url )
 	{
-		return jdbcTemplate.update( SQL_INSERT, tgChatId, url ) == 1;
+		return jdbcTemplate.update( SQL_INSERT, tgChatId, url.toString() ) == 1;
 	}
 
 	@Override
-	public boolean remove( long tgChatId, @NonNull String url )
+	public boolean remove( long tgChatId, @NonNull URI url )
 	{
-		return jdbcTemplate.update( SQL_DELETE, tgChatId, url ) == 1;
+		return jdbcTemplate.update( SQL_DELETE, tgChatId, url.toString() ) == 1;
 	}
 
 	@Override
@@ -49,8 +50,8 @@ public class JdbcChatLinkRepository implements ChatLinkRepository
 	}
 
 	@Override
-	public @NonNull List<ChatLink> findByUrl( @NonNull String url )
+	public @NonNull List<ChatLink> findByUrl( @NonNull URI url )
 	{
-		return jdbcTemplate.query( SQL_SELECT_BY_URL, ROW_MAPPER, url );
+		return jdbcTemplate.query( SQL_SELECT_BY_URL, ROW_MAPPER, url.toString() );
 	}
 }

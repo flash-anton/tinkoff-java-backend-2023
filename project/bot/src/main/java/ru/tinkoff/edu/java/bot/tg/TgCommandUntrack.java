@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
+import java.net.URI;
+
 @Component
 @RequiredArgsConstructor
 public class TgCommandUntrack implements TgCommand
@@ -35,7 +37,7 @@ public class TgCommandUntrack implements TgCommand
 			return new SendMessage( chatId, "Синтаксис команды: " + name() + " url" );
 		}
 
-		String url = parts[1];
+		URI url = URI.create( parts[1] );
 		scrapperClient.deleteLink( chatId, url );
 		return new SendMessage( chatId, "Отслеживание ссылки прекращено" );
 	}

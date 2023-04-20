@@ -10,6 +10,7 @@ import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Random;
@@ -19,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LinkRepositoryTest extends IntegrationEnvironment
 {
-	private String url;
+	private URI url;
 
 	@BeforeEach
 	void beforeEach()
 	{
-		url = "url-" + new Random().nextLong( 1_000_000 );
+		url = URI.create( "url-" + new Random().nextLong( 1_000_000 ) );
 	}
 
 	@Transactional
@@ -134,6 +135,7 @@ public class LinkRepositoryTest extends IntegrationEnvironment
 		// given
 		Stream.generate( () -> "url-" + new Random().nextLong( 1_000_000 ) )
 			  .limit( 100 )
+			  .map( URI::create )
 			  .forEach( this::jdbcTemplateAdd );
 
 		// when
@@ -151,6 +153,7 @@ public class LinkRepositoryTest extends IntegrationEnvironment
 		// given
 		Stream.generate( () -> "url-" + new Random().nextLong( 1_000_000 ) )
 			  .limit( 100 )
+			  .map( URI::create )
 			  .peek( this::jdbcTemplateAdd )
 			  .forEach( url ->
 			  {
@@ -169,26 +172,29 @@ public class LinkRepositoryTest extends IntegrationEnvironment
 		assertTrue( expected.containsAll( actual ) );
 	}
 
-	private void assertExists( String... expected )
+	private void assertExists( URI... expected )
 	{
 		assertExists( List.of( expected ) );
 	}
 
-	private void assertExists( @NotNull List<String> expected )
+	private void assertExists( @NotNull List<URI> expected )
 	{
-		List<String> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER )
-										  .stream().map( Link::url ).toList();
+		List<URI> actual = jdbcTemplate
+			.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER )
+			.stream()
+			.map( Link::url )
+			.toList();
 		assertEquals( expected.size(), actual.size() );
 		assertTrue( expected.containsAll( actual ) );
 	}
 
-	private void jdbcTemplateAdd( @NonNull String url )
+	private void jdbcTemplateAdd( @NonNull URI url )
 	{
-		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, url );
+		jdbcTemplate.update( JdbcLinkRepository.SQL_INSERT, url.toString() );
 	}
 
-	private void jdbcTemplateUpdate( @NonNull String url, @NonNull OffsetDateTime updated )
+	private void jdbcTemplateUpdate( @NonNull URI url, @NonNull OffsetDateTime updated )
 	{
-		jdbcTemplate.update( JdbcLinkRepository.SQL_UPDATE, updated, url );
+		jdbcTemplate.update( JdbcLinkRepository.SQL_UPDATE, updated, url.toString() );
 	}
 }
