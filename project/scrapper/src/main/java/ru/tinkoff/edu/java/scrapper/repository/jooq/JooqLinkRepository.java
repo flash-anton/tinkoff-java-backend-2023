@@ -9,6 +9,7 @@ import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static ru.tinkoff.edu.java.scrapper.domain.jooq.Tables.LINK;
@@ -17,7 +18,7 @@ import static ru.tinkoff.edu.java.scrapper.domain.jooq.Tables.LINK;
 public class JooqLinkRepository implements LinkRepository
 {
 	public static final RecordMapper<LinkRecord, Link> RECORD_MAPPER = record ->
-		new Link( record.getUrl(), record.getUpdated() );
+		new Link( record.getUrl(), record.getUpdated().atZoneSameInstant( ZoneId.of( "Z" ) ).toOffsetDateTime() );
 
 	private final DSLContext dsl;
 
