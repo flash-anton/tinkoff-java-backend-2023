@@ -2,19 +2,15 @@ package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
 import ru.tinkoff.edu.java.scrapper.entity.ChatLink;
 import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
 
 import java.sql.ResultSet;
 import java.util.List;
 
-@Repository
 @RequiredArgsConstructor
-@Qualifier( "JdbcChatLinkRepository" )
 public class JdbcChatLinkRepository implements ChatLinkRepository
 {
 	public static final String SQL_INSERT = "insert into chat_link (chat_id, link_url) values (?,?) on conflict do nothing";

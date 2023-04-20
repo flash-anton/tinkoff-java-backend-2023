@@ -3,17 +3,13 @@ package ru.tinkoff.edu.java.scrapper.repository.jooq;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
 import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
 
 import java.util.List;
 
 import static ru.tinkoff.edu.java.scrapper.domain.jooq.Tables.CHAT;
 
-@Repository
 @RequiredArgsConstructor
-@Qualifier( "JooqChatRepository" )
 public class JooqChatRepository implements ChatRepository
 {
 	private final DSLContext dsl;

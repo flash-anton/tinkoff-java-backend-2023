@@ -1,4 +1,4 @@
-package ru.tinkoff.edu.java.scrapper.repository.jdbc;
+package ru.tinkoff.edu.java.scrapper.repository;
 
 import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +7,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
 import java.util.List;
 

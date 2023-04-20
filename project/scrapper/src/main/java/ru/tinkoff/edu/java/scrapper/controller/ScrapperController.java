@@ -1,7 +1,6 @@
 package ru.tinkoff.edu.java.scrapper.controller;
 
-import lombok.NonNull;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.tinkoff.edu.java.scrapper.dto.AddLinkRequest;
 import ru.tinkoff.edu.java.scrapper.dto.LinkResponse;
@@ -13,18 +12,11 @@ import ru.tinkoff.edu.java.scrapper.service.LinkService;
 import java.util.Comparator;
 
 @RestController
+@RequiredArgsConstructor
 public class ScrapperController
 {
 	private final ChatService chatService;
 	private final LinkService linkService;
-
-	public ScrapperController(
-		@NonNull @Qualifier( "JooqChatService" ) ChatService chatService,
-		@NonNull @Qualifier( "JooqLinkService" ) LinkService linkService )
-	{
-		this.chatService = chatService;
-		this.linkService = linkService;
-	}
 
 	// Зарегистрировать чат
 	@PostMapping( "/tg-chat/{id}" )

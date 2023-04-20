@@ -1,4 +1,4 @@
-package ru.tinkoff.edu.java.scrapper.repository.jdbc;
+package ru.tinkoff.edu.java.scrapper.repository;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +7,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
 import ru.tinkoff.edu.java.scrapper.entity.ChatLink;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
 import java.util.List;
 import java.util.Random;
@@ -14,7 +17,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment
+public class ChatLinkRepositoryTest extends IntegrationEnvironment
 {
 	private ChatLink chatLink;
 

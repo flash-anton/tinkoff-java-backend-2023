@@ -1,4 +1,4 @@
-package ru.tinkoff.edu.java.scrapper.repository.jdbc;
+package ru.tinkoff.edu.java.scrapper.repository;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -8,6 +8,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JdbcLinkRepositoryTest extends IntegrationEnvironment
+public class LinkRepositoryTest extends IntegrationEnvironment
 {
 	private String url;
 

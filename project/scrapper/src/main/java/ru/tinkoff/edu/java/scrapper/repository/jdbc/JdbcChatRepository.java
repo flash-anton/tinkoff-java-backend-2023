@@ -2,16 +2,12 @@ package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
 
 import java.util.List;
 
-@Repository
 @RequiredArgsConstructor
-@Qualifier( "JdbcChatRepository" )
 public class JdbcChatRepository implements ChatRepository
 {
 	public static final String SQL_INSERT = "insert into chat (id) values (?) on conflict do nothing";

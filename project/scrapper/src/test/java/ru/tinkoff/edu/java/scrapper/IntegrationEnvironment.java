@@ -8,7 +8,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.DirectoryResourceAccessor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,15 +28,12 @@ abstract public class IntegrationEnvironment
 	public JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	@Qualifier( "JooqChatLinkRepository" )
 	public ChatLinkRepository chatLinkRepository;
 
 	@Autowired
-	@Qualifier( "JooqChatRepository" )
 	public ChatRepository chatRepository;
 
 	@Autowired
-	@Qualifier( "JooqLinkRepository" )
 	public LinkRepository linkRepository;
 
 	static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER;

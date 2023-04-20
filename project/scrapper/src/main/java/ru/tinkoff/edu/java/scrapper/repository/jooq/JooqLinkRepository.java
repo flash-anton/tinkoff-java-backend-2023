@@ -4,8 +4,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
 import ru.tinkoff.edu.java.scrapper.domain.jooq.tables.records.LinkRecord;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
@@ -15,9 +13,7 @@ import java.util.List;
 
 import static ru.tinkoff.edu.java.scrapper.domain.jooq.Tables.LINK;
 
-@Repository
 @RequiredArgsConstructor
-@Qualifier( "JooqLinkRepository" )
 public class JooqLinkRepository implements LinkRepository
 {
 	public static final RecordMapper<LinkRecord, Link> RECORD_MAPPER = record ->

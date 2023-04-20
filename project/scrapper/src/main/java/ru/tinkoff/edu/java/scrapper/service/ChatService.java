@@ -1,13 +1,15 @@
 package ru.tinkoff.edu.java.scrapper.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import ru.tinkoff.edu.java.scrapper.exception.NotFoundException;
 import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
 
+@Service
 @RequiredArgsConstructor
-public abstract class ChatService
+public class ChatService
 {
-	protected final ChatRepository chatRepository;
+	private final ChatRepository chatRepository;
 
 	public void add( long tgChatId )
 	{

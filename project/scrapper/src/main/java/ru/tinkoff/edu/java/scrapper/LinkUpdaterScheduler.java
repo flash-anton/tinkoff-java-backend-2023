@@ -1,10 +1,9 @@
 package ru.tinkoff.edu.java.scrapper;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
-@ConfigurationPropertiesScan
+@RequiredArgsConstructor
 @EnableScheduling
 public class LinkUpdaterScheduler
 {
@@ -34,22 +33,6 @@ public class LinkUpdaterScheduler
 	private final GitHubClient gitHubClient;
 	private final BotClient botClient;
 	private final Logger logger = LogManager.getLogger();
-
-	public LinkUpdaterScheduler(
-		@NonNull JdbcTemplate jdbcTemplate,
-		@NonNull @Qualifier( "JooqLinkService" ) LinkService linkService,
-		@NonNull LinkParser linkParser,
-		@NonNull StackOverflowClient stackOverflowClient,
-		@NonNull GitHubClient gitHubClient,
-		@NonNull BotClient botClient )
-	{
-		this.jdbcTemplate = jdbcTemplate;
-		this.linkService = linkService;
-		this.linkParser = linkParser;
-		this.stackOverflowClient = stackOverflowClient;
-		this.gitHubClient = gitHubClient;
-		this.botClient = botClient;
-	}
 
 	@Scheduled( fixedDelayString = "#{@schedulerIntervalMs}" )
 	public void update()

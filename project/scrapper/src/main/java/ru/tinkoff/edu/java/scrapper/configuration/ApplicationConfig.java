@@ -1,18 +1,82 @@
 package ru.tinkoff.edu.java.scrapper.configuration;
 
 import jakarta.validation.constraints.NotNull;
+import org.jooq.DSLContext;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import ru.tinkoff.edu.java.linkparser.GitHubLinkParser;
 import ru.tinkoff.edu.java.linkparser.LinkParser;
 import ru.tinkoff.edu.java.linkparser.StackOverflowLinkParser;
 import ru.tinkoff.edu.java.scrapper.dto.Scheduler;
+import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqLinkRepository;
 
 @Validated
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public record ApplicationConfig( @NotNull String test, @NotNull Scheduler scheduler )
+@ConfigurationProperties( prefix = "app", ignoreUnknownFields = false )
+public record ApplicationConfig( @NotNull String test, @NotNull Scheduler scheduler, @NotNull AccessType databaseAccessType )
 {
+	public enum AccessType
+	{
+		JDBC, JOOQ
+	}
+
+	@Configuration
+	@ConditionalOnProperty( prefix = "app", name = "database-access-type", havingValue = "jdbc" )
+	public static class JdbcAccessConfiguration
+	{
+		@Bean
+		public ChatLinkRepository chatLinkRepository( JdbcTemplate jdbcTemplate )
+		{
+			return new JdbcChatLinkRepository( jdbcTemplate );
+		}
+
+		@Bean
+		public ChatRepository chatRepository( JdbcTemplate jdbcTemplate )
+		{
+			return new JdbcChatRepository( jdbcTemplate );
+		}
+
+		@Bean
+		public LinkRepository linkRepository( JdbcTemplate jdbcTemplate )
+		{
+			return new JdbcLinkRepository( jdbcTemplate );
+		}
+	}
+
+	@Configuration
+	@ConditionalOnProperty( prefix = "app", name = "database-access-type", havingValue = "jooq" )
+	public static class JooqAccessConfiguration
+	{
+		@Bean
+		public ChatLinkRepository chatLinkRepository( DSLContext dsl )
+		{
+			return new JooqChatLinkRepository( dsl );
+		}
+
+		@Bean
+		public ChatRepository chatRepository( DSLContext dsl )
+		{
+			return new JooqChatRepository( dsl );
+		}
+
+		@Bean
+		public LinkRepository linkRepository( DSLContext dsl )
+		{
+			return new JooqLinkRepository( dsl );
+		}
+	}
+
 	@Bean
 	public long schedulerIntervalMs()
 	{

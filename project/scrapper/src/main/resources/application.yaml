@@ -1,6 +1,7 @@
 app:
   test: 111
   scheduler.interval: PT5S
+  database-access-type: jooq
 
 clients:
   github:

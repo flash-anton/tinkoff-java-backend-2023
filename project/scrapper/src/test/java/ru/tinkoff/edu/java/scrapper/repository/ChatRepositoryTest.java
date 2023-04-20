@@ -1,4 +1,4 @@
-package ru.tinkoff.edu.java.scrapper.repository.jdbc;
+package ru.tinkoff.edu.java.scrapper.repository;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.IntegrationEnvironment;
+import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcChatRepository;
 
 import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JdbcChatRepositoryTest extends IntegrationEnvironment
+public class ChatRepositoryTest extends IntegrationEnvironment
 {
 	private long chatId;
 

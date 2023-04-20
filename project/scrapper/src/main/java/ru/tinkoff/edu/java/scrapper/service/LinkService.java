@@ -2,6 +2,7 @@ package ru.tinkoff.edu.java.scrapper.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.tinkoff.edu.java.scrapper.entity.ChatLink;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
@@ -13,12 +14,13 @@ import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
-public abstract class LinkService
+public class LinkService
 {
-	protected final ChatRepository chatRepository;
-	protected final ChatLinkRepository chatLinkRepository;
-	protected final LinkRepository linkRepository;
+	private final ChatRepository chatRepository;
+	private final ChatLinkRepository chatLinkRepository;
+	private final LinkRepository linkRepository;
 
 	@Transactional
 	public void add( long tgChatId, @NonNull String url )
