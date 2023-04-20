@@ -13,7 +13,6 @@ import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -154,8 +153,10 @@ public class LinkRepositoryTest extends IntegrationEnvironment
 			  .limit( 100 )
 			  .peek( this::jdbcTemplateAdd )
 			  .forEach( url ->
-				  IntStream.range( 1970, 2023 ).forEach( year ->
-					  jdbcTemplateUpdate( url, OffsetDateTime.parse( year + "-04-18T02:09:00+00:00" ) ) ) );
+			  {
+				  int year = new Random().nextInt( 1970, 2023 );
+				  jdbcTemplateUpdate( url, OffsetDateTime.parse( year + "-04-18T02:09:00+00:00" ) );
+			  } );
 
 		OffsetDateTime updatedBefore = OffsetDateTime.parse( "2000-04-18T02:09:00+00:00" );
 
