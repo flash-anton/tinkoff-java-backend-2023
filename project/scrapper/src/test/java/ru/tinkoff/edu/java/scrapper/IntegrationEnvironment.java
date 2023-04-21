@@ -12,9 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
-import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
-import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
-import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -22,19 +19,10 @@ import java.sql.DriverManager;
 
 @SpringBootTest
 @ContextConfiguration( classes = TestConfig.class )
-abstract public class IntegrationEnvironment
+public abstract class IntegrationEnvironment
 {
 	@Autowired
 	public JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	public ChatLinkRepository chatLinkRepository;
-
-	@Autowired
-	public ChatRepository chatRepository;
-
-	@Autowired
-	public LinkRepository linkRepository;
 
 	static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER;
 

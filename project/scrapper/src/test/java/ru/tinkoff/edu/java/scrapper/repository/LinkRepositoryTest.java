@@ -1,6 +1,7 @@
 package ru.tinkoff.edu.java.scrapper.repository;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LinkRepositoryTest extends IntegrationEnvironment
+@RequiredArgsConstructor
+public abstract class LinkRepositoryTest extends IntegrationEnvironment
 {
+	private final LinkRepository linkRepository;
 	private URI url;
 
 	@BeforeEach

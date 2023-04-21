@@ -1,5 +1,6 @@
 package ru.tinkoff.edu.java.scrapper.repository;
 
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,10 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ChatRepositoryTest extends IntegrationEnvironment
+@RequiredArgsConstructor
+public abstract class ChatRepositoryTest extends IntegrationEnvironment
 {
+	private final ChatRepository chatRepository;
 	private long chatId;
 
 	@BeforeEach
