@@ -1,7 +1,7 @@
 app:
   test: 111
   scheduler.interval: PT5S
-  database-access-type: jooq
+  database-access-type: jpa
 
 clients:
   github:

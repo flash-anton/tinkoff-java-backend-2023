@@ -1,5 +1,6 @@
 package ru.tinkoff.edu.java.scrapper.configuration;
 
+import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
 import org.jooq.DSLContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,6 +22,9 @@ import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqChatRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaChatLinkRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaChatRepository;
+import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaLinkRepository;
 
 @Validated
 @ConfigurationProperties( prefix = "app", ignoreUnknownFields = false )
@@ -28,7 +32,7 @@ public record ApplicationConfig( @NotNull String test, @NotNull Scheduler schedu
 {
 	public enum AccessType
 	{
-		JDBC, JOOQ
+		JDBC, JOOQ, JPA
 	}
 
 	@Configuration
@@ -74,6 +78,29 @@ public record ApplicationConfig( @NotNull String test, @NotNull Scheduler schedu
 		public LinkRepository linkRepository( DSLContext dsl )
 		{
 			return new JooqLinkRepository( dsl );
+		}
+	}
+
+	@Configuration
+	@ConditionalOnProperty( prefix = "app", name = "database-access-type", havingValue = "jpa" )
+	public static class JpaAccessConfiguration
+	{
+		@Bean
+		public ChatLinkRepository chatLinkRepository( EntityManager entityManager )
+		{
+			return new JpaChatLinkRepository( entityManager );
+		}
+
+		@Bean
+		public ChatRepository chatRepository( EntityManager entityManager )
+		{
+			return new JpaChatRepository( entityManager );
+		}
+
+		@Bean
+		public LinkRepository linkRepository( EntityManager entityManager )
+		{
+			return new JpaLinkRepository( entityManager );
 		}
 	}
 
