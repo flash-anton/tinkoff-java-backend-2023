@@ -14,6 +14,7 @@ import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +40,10 @@ public class LinkService
 		}
 	}
 
-	public void update( @NonNull URI url, @NonNull OffsetDateTime updated )
+	@Transactional
+	public void update( @NonNull Map<URI, OffsetDateTime> updates )
 	{
-		linkRepository.update( url, updated );
+		linkRepository.update( updates );
 	}
 
 	public @NonNull List<URI> getUrls( long tgChatId )
