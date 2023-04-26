@@ -1,5 +1,6 @@
 app:
   test: 111
   telegramToken: ${TELEGRAM_TOKEN}
+  scrapperBaseUrl: "http://localhost:8080"
 server.port: 8081
 springdoc.swagger-ui.path: /swagger-ui

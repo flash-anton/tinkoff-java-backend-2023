@@ -12,11 +12,13 @@ import ru.tinkoff.edu.java.bot.scrapperclient.dto.ListLinksResponse;
 import ru.tinkoff.edu.java.bot.scrapperclient.dto.RemoveLinkRequest;
 import ru.tinkoff.edu.java.bot.scrapperclient.exception.ApiErrorException;
 
+import java.net.URI;
+
 public class ScrapperClient
 {
 	protected final WebClient client;
 
-	public ScrapperClient( @NonNull String baseUrl )
+	public ScrapperClient( @NonNull URI baseUrl )
 	{
 		client = WebClient
 			.builder()
@@ -30,7 +32,7 @@ public class ScrapperClient
 				}
 				return Mono.just( clientResponse );
 			}))
-			.baseUrl( baseUrl )
+			.baseUrl( baseUrl.toString() )
 			.build();
 	}
 
@@ -62,7 +64,7 @@ public class ScrapperClient
 					 .block();
 	}
 
-	public LinkResponse addLink( long id, String url )
+	public LinkResponse addLink( long id, URI url )
 	{
 		return client.post()
 					 .uri( "/links", id )
@@ -73,7 +75,7 @@ public class ScrapperClient
 					 .block();
 	}
 
-	public LinkResponse deleteLink( long id, String url )
+	public LinkResponse deleteLink( long id, URI url )
 	{
 		return client.method( HttpMethod.DELETE )
 					 .uri( "/links", id )

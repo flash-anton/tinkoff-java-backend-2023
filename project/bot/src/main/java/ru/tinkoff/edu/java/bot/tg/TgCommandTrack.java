@@ -2,20 +2,17 @@ package ru.tinkoff.edu.java.bot.tg;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
+import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
 
-import java.util.HashSet;
+import java.net.URI;
 
 @Component
+@RequiredArgsConstructor
 public class TgCommandTrack implements TgCommand
 {
-	private final ApplicationConfig config;
-
-	public TgCommandTrack( ApplicationConfig config )
-	{
-		this.config = config;
-	}
+	private final ScrapperClient scrapperClient;
 
 	@Override
 	public String name()
@@ -40,17 +37,8 @@ public class TgCommandTrack implements TgCommand
 			return new SendMessage( chatId, "Синтаксис команды: " + name() + " url" );
 		}
 
-		String url = parts[1];
-		config.getTgUsers().compute( chatId, (k,v) ->
-		{
-			if( v == null )
-			{
-				v = new HashSet<>(); // регистрация пользователя вместо исключения
-			}
-			v.add( url );
-			return v;
-		});
-
+		URI url = URI.create( parts[1] );
+		scrapperClient.addLink( chatId, url );
 		return new SendMessage( chatId, "Отслеживание ссылки начато" );
 	}
 }

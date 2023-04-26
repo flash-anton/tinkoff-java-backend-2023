@@ -75,7 +75,16 @@ public class TgBot implements AutoCloseable
 		{
 			return new SendMessage( chatId, "Команда не поддерживается" );
 		}
-		return command.process( update );
+
+		try
+		{
+			return command.process( update );
+		}
+		catch( RuntimeException ex )
+		{
+			logger.error( ex.getMessage() );
+			return new SendMessage( chatId, "Ошибка" );
+		}
 	}
 
 	public void sendMessage( SendMessage message )

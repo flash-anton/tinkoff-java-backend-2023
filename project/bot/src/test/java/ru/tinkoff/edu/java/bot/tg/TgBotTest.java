@@ -4,7 +4,6 @@ import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.Test;
-import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
 
 import java.util.ArrayList;
 
@@ -16,8 +15,7 @@ public class TgBotTest
 	void unknownCommandTest()
 	{
 		// Arrange / Setup
-		ApplicationConfig config = new ApplicationConfig( null, null );
-		TgBot tgBot = new TgBot( config, new ArrayList<>() );
+		TgBot tgBot = new TgBot( null, new ArrayList<>() );
 		Update update = BotUtils.parseUpdate( "{\"message\"={\"text\"=\"/unknownCommand\",\"chat\"={\"id\"=0}}}" );
 
 		// Act

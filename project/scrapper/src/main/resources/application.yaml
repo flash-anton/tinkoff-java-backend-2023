@@ -1,6 +1,8 @@
 app:
   test: 111
   scheduler.interval: PT5S
+  database-access-type: jooq
+
 clients:
   github:
     defaultBaseUrl: https://api.github.com
@@ -10,4 +12,16 @@ clients:
   stackoverflow:
     defaultBaseUrl: https://api.stackexchange.com/2.3
     compress: true
+  bot:
+    defaultBaseUrl: http://localhost:8081
+
+spring:
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scrapper
+    driver-class-name: org.postgresql.Driver
+    username: scrapper
+    password: scrapper
+
 springdoc.swagger-ui.path: /swagger-ui
