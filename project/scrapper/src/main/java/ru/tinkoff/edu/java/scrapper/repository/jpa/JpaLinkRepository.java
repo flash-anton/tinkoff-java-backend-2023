@@ -1,7 +1,6 @@
 package ru.tinkoff.edu.java.scrapper.repository.jpa;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
@@ -12,6 +11,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
@@ -41,14 +41,28 @@ public class JpaLinkRepository implements LinkRepository
 	}
 
 	@Override
-	@Transactional
-	public boolean update( @NonNull URI url, @NonNull OffsetDateTime updated )
+	public boolean update( @NonNull Map<URI, OffsetDateTime> updates )
 	{
-		return entityManager
-				   .createQuery( "update JpaLink set updated = :updated where url = :url" )
-				   .setParameter( "updated", updated )
-				   .setParameter( "url", url.toString() )
-				   .executeUpdate() == 1;
+		if( updates.isEmpty() )
+		{
+			return false;
+		}
+
+		List<JpaLink> links = entityManager
+			.createQuery( "select l from JpaLink l where url in :urls", JpaLink.class )
+			.setParameter( "urls", updates.keySet().stream().map( URI::toString ).toList() )
+			.getResultList();
+
+		links.forEach( jpaLink ->
+		{
+			URI url = URI.create( jpaLink.getUrl() );
+			OffsetDateTime updated = updates.get( url );
+			jpaLink.setUpdated( updated );
+		} );
+
+		entityManager.flush();
+
+		return links.size() == updates.size();
 	}
 
 	@Override
