@@ -1,6 +1,5 @@
 package ru.tinkoff.edu.java.scrapper;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +18,10 @@ import ru.tinkoff.edu.java.scrapper.webclient.StackOverflowClient;
 
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,25 +36,91 @@ public class LinkUpdaterScheduler
 	private final BotClient botClient;
 	private final Logger logger = LogManager.getLogger();
 
+	private class R
+	{
+		URI url;
+		OffsetDateTime updated;
+		LinkChanges changes = new LinkChanges( new ArrayList<>() );
+
+		R( Link link )
+		{
+			url = link.url();
+			updated = link.updated();
+		}
+
+		boolean fillChanges()
+		{
+			try
+			{
+				LinkContent linkContent = linkParser.parse( url );
+
+				if( linkContent instanceof LinkContent.StackOverflowLinkContent so )
+				{
+					changes = stackOverflowClient.fetchQuestionInfo( so.questionId(), updated ).linkChanges();
+				}
+				else if( linkContent instanceof LinkContent.GitHubLinkContent gh )
+				{
+					changes = gitHubClient.fetchRepositoryInfo( gh.user(), gh.repository(), updated ).linkChanges();
+				}
+				else
+				{
+					logger.error( "Unsupported URL {}", url );
+				}
+			}
+			catch( RuntimeException ex )
+			{
+				logger.error( ex );
+			}
+			return !changes.events().isEmpty();
+		}
+
+		void notifyChats()
+		{
+			try
+			{
+				long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
+				botClient.linkUpdate( changes.toString(), url, chatIds );
+			}
+			catch( RuntimeException ex )
+			{
+				logger.error( ex );
+			}
+		}
+	}
+
 	@Scheduled( fixedDelayString = "#{@schedulerIntervalMs}" )
 	public void update()
 	{
-		linkService
+		List<R> changes = linkService
 			.getLinks( OffsetDateTime.now() )
 			.parallelStream()
-			.forEach( link ->
-			{
-				try
-				{
-					processLink( link );
-				}
-				catch( RuntimeException ex )
-				{
-					logger.error( ex );
-				}
-			} );
+			.map( R::new )
+			.filter( R::fillChanges )
+			.toList();
 
-		printDb();
+		try
+		{
+			Map<URI, OffsetDateTime> updates = changes
+				.parallelStream()
+				.collect( Collectors.toMap(
+					r -> r.url,
+					r -> r.changes.last().time() ) );
+
+			linkService.update( updates );
+		}
+		catch( RuntimeException ex )
+		{
+			logger.error( ex );
+			return;
+		}
+		finally
+		{
+			printDb();
+		}
+
+		changes
+			.parallelStream()
+			.forEach( R::notifyChats );
 	}
 
 	private void printDb()
@@ -71,34 +139,5 @@ public class LinkUpdaterScheduler
 		);
 
 		logger.info( "\n{}", String.join( "\n", rows ) );
-	}
-
-	private void processLink( @NonNull Link link )
-	{
-		URI url = link.url();
-		LinkContent linkContent = linkParser.parse( url );
-		OffsetDateTime lastUpdated = link.updated();
-
-		LinkChanges linkChanges;
-		if( linkContent instanceof LinkContent.StackOverflowLinkContent so )
-		{
-			linkChanges = stackOverflowClient.fetchQuestionInfo( so.questionId(), lastUpdated ).linkChanges();
-		}
-		else if( linkContent instanceof LinkContent.GitHubLinkContent gh )
-		{
-			linkChanges = gitHubClient.fetchRepositoryInfo( gh.user(), gh.repository(), lastUpdated ).linkChanges();
-		}
-		else
-		{
-			logger.error( "Unsupported URL {}", url );
-			return;
-		}
-
-		if( !linkChanges.events().isEmpty() )
-		{
-			long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
-			linkService.update( url, linkChanges.last().time() );
-			botClient.linkUpdate( linkChanges.toString(), url, chatIds );
-		}
 	}
 }

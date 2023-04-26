@@ -14,6 +14,7 @@ import ru.tinkoff.edu.java.scrapper.repository.jdbc.JdbcLinkRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -102,7 +103,7 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment
 		OffsetDateTime updated = OffsetDateTime.now();
 
 		// when
-		boolean result = linkRepository.update( url, updated );
+		boolean result = linkRepository.update( Map.of( url, updated ) );
 
 		// then
 		assertFalse( result );
@@ -121,10 +122,29 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment
 		OffsetDateTime updated = OffsetDateTime.parse( "2023-04-18T02:09:00+00:00" );
 
 		// when
-		boolean result = linkRepository.update( url, updated );
+		boolean result = linkRepository.update( Map.of( url, updated ) );
 
 		// then
 		assertTrue( result );
+
+		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER );
+		assertEquals( List.of( new Link( url, updated ) ), actual );
+	}
+
+	@Transactional
+	@Rollback
+	@Test
+	void updateIfPartlyExistsTest()
+	{
+		// given
+		jdbcTemplateAdd( url );
+		OffsetDateTime updated = OffsetDateTime.parse( "2023-04-18T02:09:00+00:00" );
+
+		// when
+		boolean result = linkRepository.update( Map.of( url, updated, URI.create( "absent" ), updated ) );
+
+		// then
+		assertFalse( result );
 
 		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER );
 		assertEquals( List.of( new Link( url, updated ) ), actual );

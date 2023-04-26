@@ -2,15 +2,20 @@ package ru.tinkoff.edu.java.scrapper.repository.jdbc;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.repository.LinkRepository;
 
 import java.net.URI;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class JdbcLinkRepository implements LinkRepository
@@ -39,9 +44,31 @@ public class JdbcLinkRepository implements LinkRepository
 	}
 
 	@Override
-	public boolean update( @NonNull URI url, @NonNull OffsetDateTime updated )
+	public boolean update( @NonNull Map<URI, OffsetDateTime> updates )
 	{
-		return jdbcTemplate.update( SQL_UPDATE, updated, url.toString() ) == 1;
+		if( updates.isEmpty() )
+		{
+			return false;
+		}
+
+		List<Map.Entry<URI, OffsetDateTime>> urls = updates.entrySet().stream().toList();
+		int[] result = jdbcTemplate.batchUpdate( SQL_UPDATE, new BatchPreparedStatementSetter()
+		{
+			@Override
+			public void setValues( PreparedStatement ps, int i ) throws SQLException
+			{
+				Map.Entry<URI, OffsetDateTime> e = urls.get( i );
+				ps.setObject( 1, e.getValue() );
+				ps.setString( 2, e.getKey().toString() );
+			}
+
+			@Override
+			public int getBatchSize()
+			{
+				return urls.size();
+			}
+		} );
+		return Arrays.stream( result ).sum() == updates.size();
 	}
 
 	@Override
