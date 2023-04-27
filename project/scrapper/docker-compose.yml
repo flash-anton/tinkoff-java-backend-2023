@@ -2,6 +2,15 @@ version: '3.8'
 
 services:
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
   postgresql:
     container_name: postgresql
     image: postgres:15
@@ -35,6 +44,7 @@ services:
 
 volumes:
   postgresql:
+  rabbitmq:
 
 networks:
   backend:
