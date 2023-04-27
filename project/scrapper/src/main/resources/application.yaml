@@ -3,6 +3,10 @@ app:
   scheduler.interval: PT5S
   database-access-type: jpa
 
+rabbitmq:
+  queueName: queueName
+  exchangeName: exchangeName
+
 clients:
   github:
     defaultBaseUrl: https://api.github.com
@@ -32,7 +36,9 @@ spring:
         jdbc:
           batch_size: 50
           fetch_size: 50
+          batch_versioned_data: true
         order_updates: true
+        order_inserts: true
 
 
 springdoc.swagger-ui.path: /swagger-ui
