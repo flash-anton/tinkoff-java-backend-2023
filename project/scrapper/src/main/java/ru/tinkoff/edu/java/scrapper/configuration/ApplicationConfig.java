@@ -2,6 +2,7 @@ package ru.tinkoff.edu.java.scrapper.configuration;
 
 import jakarta.persistence.EntityManager;
 import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import org.jooq.DSLContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,6 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import ru.tinkoff.edu.java.linkparser.GitHubLinkParser;
 import ru.tinkoff.edu.java.linkparser.LinkParser;
 import ru.tinkoff.edu.java.linkparser.StackOverflowLinkParser;
+import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
+import ru.tinkoff.edu.java.scrapper.botclient.dto.LinkUpdateRequest;
 import ru.tinkoff.edu.java.scrapper.dto.Scheduler;
 import ru.tinkoff.edu.java.scrapper.repository.ChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.ChatRepository;
@@ -25,14 +28,42 @@ import ru.tinkoff.edu.java.scrapper.repository.jooq.JooqLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaChatLinkRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaChatRepository;
 import ru.tinkoff.edu.java.scrapper.repository.jpa.JpaLinkRepository;
+import ru.tinkoff.edu.java.scrapper.service.BotNotifier;
+import ru.tinkoff.edu.java.scrapper.service.ScrapperQueueProducer;
+
+import java.net.URI;
 
 @Validated
 @ConfigurationProperties( prefix = "app", ignoreUnknownFields = false )
-public record ApplicationConfig( @NotNull String test, @NotNull Scheduler scheduler, @NotNull AccessType databaseAccessType )
+public record ApplicationConfig(
+	@NotNull String test,
+	@NotNull Scheduler scheduler,
+	@NotNull AccessType databaseAccessType,
+	boolean useQueue )
 {
 	public enum AccessType
 	{
 		JDBC, JOOQ, JPA
+	}
+
+	@Bean
+	public @NonNull BotNotifier botNotifier( @NonNull BotClient botClient, @NonNull ScrapperQueueProducer scrapperQueueProducer )
+	{
+		if( useQueue )
+		{
+			return ( String description, URI url, long[] tgChatIds ) ->
+			{
+				LinkUpdateRequest req = new LinkUpdateRequest();
+				req.setUrl( url );
+				req.setDescription( description );
+				req.setTgChatIds( tgChatIds );
+				scrapperQueueProducer.send( req );
+			};
+		}
+		else
+		{
+			return botClient::linkUpdate;
+		}
 	}
 
 	@Configuration

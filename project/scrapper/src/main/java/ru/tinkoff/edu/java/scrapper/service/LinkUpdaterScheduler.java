@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.tinkoff.edu.java.linkparser.LinkContent;
 import ru.tinkoff.edu.java.linkparser.LinkParser;
-import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
 import ru.tinkoff.edu.java.scrapper.dto.LinkChanges;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
@@ -32,7 +31,8 @@ public class LinkUpdaterScheduler
 	private final LinkParser linkParser;
 	private final StackOverflowClient stackOverflowClient;
 	private final GitHubClient gitHubClient;
-	private final BotClient botClient;
+	private final BotNotifier botNotifier;
+
 	private final Logger logger = LogManager.getLogger();
 
 	private class R
@@ -78,7 +78,7 @@ public class LinkUpdaterScheduler
 			try
 			{
 				long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
-				botClient.linkUpdate( changes.toString(), url, chatIds );
+				botNotifier.linkUpdate( changes.toString(), url, chatIds );
 			}
 			catch( RuntimeException ex )
 			{
