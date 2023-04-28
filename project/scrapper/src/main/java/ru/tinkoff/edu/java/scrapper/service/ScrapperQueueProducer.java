@@ -11,10 +11,10 @@ import ru.tinkoff.edu.java.scrapper.botclient.dto.LinkUpdateRequest;
 public class ScrapperQueueProducer
 {
 	private final RabbitTemplate rabbitTemplate;
-	private final Binding binding;
+	private final Binding messageBinding;
 
 	public void send( LinkUpdateRequest update )
 	{
-		rabbitTemplate.convertAndSend( binding.getExchange(), binding.getRoutingKey(), update );
+		rabbitTemplate.convertAndSend( messageBinding.getExchange(), messageBinding.getRoutingKey(), update );
 	}
 }

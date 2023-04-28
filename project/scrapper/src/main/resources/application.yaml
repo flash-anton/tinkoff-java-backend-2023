@@ -41,5 +41,6 @@ spring:
         order_updates: true
         order_inserts: true
 
+spring.rabbitmq.listener.simple.default-requeue-rejected: false
 
 springdoc.swagger-ui.path: /swagger-ui
