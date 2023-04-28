@@ -3,7 +3,6 @@ package ru.tinkoff.edu.java.scrapper.service;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
 @EnableScheduling
 public class LinkUpdaterScheduler
 {
-	private final JdbcTemplate jdbcTemplate; // для отладки
 	private final LinkService linkService;
 	private final LinkParser linkParser;
 	private final StackOverflowClient stackOverflowClient;
@@ -112,31 +110,9 @@ public class LinkUpdaterScheduler
 			logger.error( ex );
 			return;
 		}
-		finally
-		{
-			printDb();
-		}
 
 		changes
 			.parallelStream()
 			.forEach( R::notifyChats );
-	}
-
-	private void printDb()
-	{
-		List<String> rows = jdbcTemplate.query( """
-				select * from chat c
-				full join chat_link cl on c.id = cl.chat_id
-				full join link l on cl.link_url = l.url
-				order by c.id
-				""",
-			( rs, rowNum ) -> String.join( " | ",
-				String.valueOf( rs.getLong( "id" ) ),
-				String.valueOf( rs.getTimestamp( "updated" ) ),
-				rs.getString( "url" )
-			)
-		);
-
-		logger.info( "\n{}", String.join( "\n", rows ) );
 	}
 }
