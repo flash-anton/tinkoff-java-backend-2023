@@ -2,7 +2,13 @@ app:
   test: 111
   telegramToken: ${TELEGRAM_TOKEN}
   scrapperBaseUrl: "http://localhost:8080"
+
 rabbitmq:
   queueName: queueName
-server.port: 8081
+  exchangeName: exchangeName
+
+spring.rabbitmq.listener.simple.default-requeue-rejected: false
+
 springdoc.swagger-ui.path: /swagger-ui
+
+server.port: 8081
