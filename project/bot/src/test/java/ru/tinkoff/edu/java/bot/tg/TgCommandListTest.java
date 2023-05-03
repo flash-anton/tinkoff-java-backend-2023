@@ -3,66 +3,56 @@ package ru.tinkoff.edu.java.bot.tg;
 import com.pengrad.telegrambot.BotUtils;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import ru.tinkoff.edu.java.bot.scrapperclient.ScrapperClient;
+import ru.tinkoff.edu.java.bot.scrapperclient.dto.LinkResponse;
+import ru.tinkoff.edu.java.bot.scrapperclient.dto.ListLinksResponse;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TgCommandListTest
 {
-	@Test
-	void severalUrlsInUrlListTest()
+	@ParameterizedTest
+	@ValueSource( ints = {0, 1, 10} )
+	void correctAnswerOnDifferentUrlsNumber( int urlsNumber )
 	{
-		urlsTest( 123461, Set.of( 0, 5, 2, 4, 1, 3 ) );
-	}
+		// given
+		long chatId = new Random().nextInt( 1_000_000 );
 
-	@Test
-	void singleUrlInUrlListTest()
-	{
-		urlsTest( 74586345, Set.of( 0 ) );
-	}
+		Set<URI> urls = IntStream
+			.range( 0, urlsNumber )
+			.mapToObj( i -> URI.create( "http://localhost:" + i ) )
+			.collect( Collectors.toSet() );
 
-	@Test
-	void emptyUrlListTest()
-	{
-		urlsTest( 8250756, Set.of() );
-	}
+		LinkResponse[] linkResponseArray = urls
+			.stream()
+			.map( url -> new LinkResponse( chatId, url ) )
+			.toArray( LinkResponse[]::new );
 
-	@Test
-	void nullUrlListTest()
-	{
-		urlsTest( 123125, null );
-	}
+		ListLinksResponse listLinksResponse = new ListLinksResponse( linkResponseArray, linkResponseArray.length );
 
-	void urlsTest( long chatId, Set<Integer> ports )
-	{
-		// Arrange / Setup
-		Set<URI> urls = new HashSet<>();
-		if( ports != null && !ports.isEmpty() )
-		{
-			urls = ports
-				.parallelStream()
-				.map( port -> URI.create( "http://localhost:" + port ) )
-				.collect( Collectors.toSet() );
-		}
+		ScrapperClient scrapperClient = Mockito.mock( ScrapperClient.class );
+		Mockito.when( scrapperClient.getAllLinks( Mockito.eq( chatId ) ) ).thenReturn( listLinksResponse );
 
-		ScrapperClient scrapperClient = new ScrapperClient( URI.create( "http://localhost:8080" ) );
-		scrapperClient.addChat( chatId );
-		urls.forEach( url -> scrapperClient.addLink( chatId, url ) );
 		TgCommandList cmd = new TgCommandList( scrapperClient );
 
 		Update update = BotUtils.parseUpdate( "{\"message\"={\"chat\"={\"id\"=" + chatId + "}}}" );
 
 
-		// Act
+		// when
 		SendMessage msg = cmd.process( update );
 
 
-		// Assert
+		// then
 		String text = (String)msg.getParameters().get( "text" );
 
 		if( urls.isEmpty() )
