@@ -138,16 +138,22 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment
 	{
 		// given
 		jdbcTemplateAdd( url );
+		URI urlExists = URI.create( "exists" );
+		jdbcTemplateAdd( urlExists );
+		URI urlAbsent = URI.create( "absent" );
 		OffsetDateTime updated = OffsetDateTime.parse( "2023-04-18T02:09:00+00:00" );
 
 		// when
-		boolean result = linkRepository.update( Map.of( url, updated, URI.create( "absent" ), updated ) );
+		boolean result = linkRepository.update( Map.of( url, updated, urlExists, updated, urlAbsent, updated ) );
 
 		// then
 		assertFalse( result );
 
 		List<Link> actual = jdbcTemplate.query( JdbcLinkRepository.SQL_SELECT_ALL, JdbcLinkRepository.ROW_MAPPER );
-		assertEquals( List.of( new Link( url, updated ) ), actual );
+
+		List<Link> expected = List.of( new Link( url, updated ), new Link( urlExists, updated ) );
+		assertEquals( expected.size(), actual.size() );
+		assertTrue( expected.containsAll( actual ) );
 	}
 
 	@Transactional
