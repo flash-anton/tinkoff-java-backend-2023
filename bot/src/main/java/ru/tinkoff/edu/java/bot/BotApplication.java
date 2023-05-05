@@ -1,5 +1,6 @@
 package ru.tinkoff.edu.java.bot;
 
+import org.apache.logging.log4j.LogManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -13,7 +14,7 @@ public class BotApplication {
 		var ctx = SpringApplication.run(BotApplication.class, args);
 		ApplicationConfig config = ctx.getBean(ApplicationConfig.class);
 		config = new ApplicationConfig( config.test(), "***", config.scrapperBaseUrl() );
-		System.out.println(config);
+		LogManager.getLogger().info(config);
 
 		TgBot tgBot = ctx.getBean( TgBot.class );
 		tgBot.start();

@@ -2,8 +2,8 @@ package ru.tinkoff.edu.java.scrapper.webclient;
 
 import lombok.NonNull;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.tinkoff.edu.java.scrapper.dto.LinkChanges;
 import ru.tinkoff.edu.java.scrapper.dto.GitHubRepositoryInfoResponse;
+import ru.tinkoff.edu.java.scrapper.dto.LinkChanges;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;

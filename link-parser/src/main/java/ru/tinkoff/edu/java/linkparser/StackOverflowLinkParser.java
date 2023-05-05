@@ -1,7 +1,6 @@
 package ru.tinkoff.edu.java.linkparser;
 
 import org.jetbrains.annotations.NotNull;
-
 import ru.tinkoff.edu.java.linkparser.LinkContent.*;
 
 import java.net.URI;

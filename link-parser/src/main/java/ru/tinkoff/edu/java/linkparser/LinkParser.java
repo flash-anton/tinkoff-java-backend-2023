@@ -2,10 +2,9 @@ package ru.tinkoff.edu.java.linkparser;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.tinkoff.edu.java.linkparser.LinkContent.*;
 
 import java.net.URI;
-
-import ru.tinkoff.edu.java.linkparser.LinkContent.*;
 
 /**
  * Абстрактный парсер ссылки в Цепочке Обязанностей.

@@ -10,7 +10,7 @@ import ru.tinkoff.edu.java.scrapper.botclient.dto.LinkUpdateRequest;
 
 @Service
 @RequiredArgsConstructor
-@RabbitListener( queues = "${rabbitmq.queueName}"+".dlq" )
+@RabbitListener( queues = "${rabbitmq.queueName}" + ".dlq" )
 public class ScrapperDLQListener
 {
 	private final Logger logger = LogManager.getLogger();
