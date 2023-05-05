@@ -1,6 +1,6 @@
 app:
   test: 111
-  scheduler.interval: PT5S
+  scheduler.interval: PT1M
   database-access-type: jpa
   useQueue: true
 
