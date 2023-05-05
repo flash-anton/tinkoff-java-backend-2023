@@ -34,3 +34,6 @@ jobs:
       -
         name: Maven package scrapper
         run: mvn package -pl scrapper -am
+      -
+        name: Docker build scrapper
+        run: docker build scrapper -t image-scrapper
