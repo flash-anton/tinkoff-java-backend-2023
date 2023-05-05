@@ -23,3 +23,6 @@ jobs:
       -
         name: Maven package bot
         run: mvn package -pl bot -am
+      -
+        name: Docker build bot
+        run: docker build bot -t image-bot
