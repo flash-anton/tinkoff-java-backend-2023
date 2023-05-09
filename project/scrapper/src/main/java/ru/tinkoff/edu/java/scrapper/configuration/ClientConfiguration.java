@@ -1,10 +1,11 @@
 package ru.tinkoff.edu.java.scrapper.configuration;
 
+import lombok.Data;
 import lombok.NonNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -16,10 +17,15 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
-@Validated
-@ConfigurationProperties( prefix = "clients" )
-public record ClientConfiguration( @NonNull WebClientDefaultConfig github, @NonNull WebClientDefaultConfig stackoverflow, @NonNull WebClientDefaultConfig bot )
+@Configuration
+@ConfigurationProperties( prefix = "clients", ignoreUnknownFields = false )
+@Data
+public class ClientConfiguration
 {
+	private WebClientDefaultConfig github;
+	private WebClientDefaultConfig stackoverflow;
+	private WebClientDefaultConfig bot;
+
 	@Bean
 	public GitHubClient gitHubClient()
 	{

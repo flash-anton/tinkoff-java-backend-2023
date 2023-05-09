@@ -1,18 +1,15 @@
-package ru.tinkoff.edu.java.scrapper;
+package ru.tinkoff.edu.java.scrapper.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.tinkoff.edu.java.linkparser.LinkContent;
 import ru.tinkoff.edu.java.linkparser.LinkParser;
-import ru.tinkoff.edu.java.scrapper.botclient.BotClient;
 import ru.tinkoff.edu.java.scrapper.dto.LinkChanges;
 import ru.tinkoff.edu.java.scrapper.entity.Link;
-import ru.tinkoff.edu.java.scrapper.service.LinkService;
 import ru.tinkoff.edu.java.scrapper.webclient.GitHubClient;
 import ru.tinkoff.edu.java.scrapper.webclient.StackOverflowClient;
 
@@ -28,12 +25,12 @@ import java.util.stream.Collectors;
 @EnableScheduling
 public class LinkUpdaterScheduler
 {
-	private final JdbcTemplate jdbcTemplate; // для отладки
 	private final LinkService linkService;
 	private final LinkParser linkParser;
 	private final StackOverflowClient stackOverflowClient;
 	private final GitHubClient gitHubClient;
-	private final BotClient botClient;
+	private final BotNotifier botNotifier;
+
 	private final Logger logger = LogManager.getLogger();
 
 	private class R
@@ -79,7 +76,7 @@ public class LinkUpdaterScheduler
 			try
 			{
 				long[] chatIds = linkService.getChats( url ).parallelStream().mapToLong( l -> l ).toArray();
-				botClient.linkUpdate( changes.toString(), url, chatIds );
+				botNotifier.linkUpdate( changes.toString(), url, chatIds );
 			}
 			catch( RuntimeException ex )
 			{
@@ -113,31 +110,9 @@ public class LinkUpdaterScheduler
 			logger.error( ex );
 			return;
 		}
-		finally
-		{
-			printDb();
-		}
 
 		changes
 			.parallelStream()
 			.forEach( R::notifyChats );
-	}
-
-	private void printDb()
-	{
-		List<String> rows = jdbcTemplate.query( """
-				select * from chat c
-				full join chat_link cl on c.id = cl.chat_id
-				full join link l on cl.link_url = l.url
-				order by c.id
-				""",
-			( rs, rowNum ) -> String.join( " | ",
-				String.valueOf( rs.getLong( "id" ) ),
-				String.valueOf( rs.getTimestamp( "updated" ) ),
-				rs.getString( "url" )
-			)
-		);
-
-		logger.info( "\n{}", String.join( "\n", rows ) );
 	}
 }
