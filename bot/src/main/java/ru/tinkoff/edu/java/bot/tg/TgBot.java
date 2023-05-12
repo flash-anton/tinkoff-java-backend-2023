@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import ru.tinkoff.edu.java.bot.configuration.ApplicationConfig;
+import ru.tinkoff.edu.java.bot.metric.ProcessedTgMessagesMetric;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,6 +85,10 @@ public class TgBot implements AutoCloseable
 		{
 			logger.error( ex.getMessage() );
 			return new SendMessage( chatId, "Ошибка" );
+		}
+		finally
+		{
+			ProcessedTgMessagesMetric.COUNTER.increment();
 		}
 	}
 

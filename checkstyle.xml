@@ -270,7 +270,7 @@
         </module>
         <module name="NeedBraces"/>
         <module name="RightCurly">
-            <property name="tokens" value="LITERAL_CATCH, LITERAL_FINALLY, LITERAL_ELSE"/>
+            <property name="tokens" value="LITERAL_FINALLY, LITERAL_ELSE"/>
         </module>
 
 
