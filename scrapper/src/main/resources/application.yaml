@@ -1,0 +1,46 @@
+app:
+  test: 111
+  scheduler.interval: PT1M
+  database-access-type: jpa
+  useQueue: true
+
+rabbitmq:
+  queueName: queueName
+  exchangeName: exchangeName
+
+clients:
+  github:
+    defaultBaseUrl: https://api.github.com
+    defaultHeaders:
+      Accept: application/vnd.github+json
+      X-GitHub-Api-Version: 2022-11-28
+  stackoverflow:
+    defaultBaseUrl: https://api.stackexchange.com/2.3
+    compress: true
+  bot:
+    defaultBaseUrl: http://localhost:8081
+
+spring:
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scrapper
+    driver-class-name: org.postgresql.Driver
+    username: scrapper
+    password: scrapper
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+        show_sql: true
+        jdbc:
+          batch_size: 50
+          fetch_size: 50
+          batch_versioned_data: true
+        order_updates: true
+        order_inserts: true
+
+spring.rabbitmq.listener.simple.default-requeue-rejected: false
+
+springdoc.swagger-ui.path: /swagger-ui

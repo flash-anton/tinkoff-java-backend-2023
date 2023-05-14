@@ -1,0 +1,67 @@
+name: build-bot
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bot.yml'
+      - 'bot/**'
+
+jobs:
+
+  checkstyle:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+      -
+        name: Maven checkstyle bot
+        run: mvn -pl bot -am checkstyle:check
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+      -
+        name: Maven package jar bot
+        run: mvn package -pl bot -am
+      -
+        name: Docker login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Docker prepare tags and labels for image bot
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/bot
+      -
+        name: Docker build image bot and push it to GitHub Container Registry
+        uses: docker/build-push-action@v4
+        with:
+          context: bot
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
